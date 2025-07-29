@@ -483,6 +483,12 @@ Draw.loadPlugin(function(editorUi)
 		function wait(ms = 1500) {
 			animationScript += `wait ${ms}\n`;
 		}
+		function addInterDiagramLink(sourceId, targetId) {
+			animationScript += `add ${sourceId} ${targetId}\n`;
+		}
+		function removeInterDiagramLink(sourceId, targetId) {
+			animationScript += `remove ${sourceId} ${targetId}\n`;
+		}
 
 		const initialLfParent = findLifelineByRectId(flow[0].source);
 		const initialLf = flow[0].source;
@@ -513,80 +519,73 @@ Draw.loadPlugin(function(editorUi)
 
 		// Animate a call step
 		function animateCallStep(msg, sourceParent, targetParent) {
-			if (!highlighted.has(msg.id)) {
+			if (!highlighted.has(msg.id)) { 								// highlight sipky v SqD
 				highlightArrow(msg.id);
 			}
-			if (msg.matchedClassId && !highlighted.has(msg.matchedClassId)) {
+			if (sourceParent.matchedClassId && !highlighted.has(sourceParent.matchedClassId)) { // highlight source triedy v CD
+				highlightCell(sourceParent.matchedClassId);
+			}
+			if (msg.matchedClassId && !highlighted.has(msg.matchedClassId)) { // highlight metody v CD
 				highlightCell(msg.matchedClassId);
 			}
+			if (msg.matchedClassId && msg.id) {								// zlta sipka medzi metodou v CD a sipkou v SqD
+				addInterDiagramLink(msg.matchedClassId, msg.id);
+			}
 			const relation = findRelationBetweenClasses(sourceParent.matchedClassId, targetParent.matchedClassId);
-			if (relation && !highlighted.has(relation.id)) {
+			if (relation && !highlighted.has(relation.id)) { 				// highlight sipky medzi triedami v CD
 				highlightArrow(relation.id);
 			}
 			wait();
-			if (targetParent.id && !highlighted.has(targetParent.id)) {
+			if (targetParent.id && !highlighted.has(targetParent.id)) {		// highlight lifeline bloku v SqD
 				highlightCell(targetParent.id);
 			}
-			if (msg.target && !highlighted.has(msg.target)) {
+			if (msg.target && !highlighted.has(msg.target)) {				// highlight lifeline bloku v SqD
 				highlightCell(msg.target);
 			}
-			if (targetParent.matchedClassId && !highlighted.has(targetParent.matchedClassId)) {
+			if (targetParent.matchedClassId && !highlighted.has(targetParent.matchedClassId)) { // highlight target triedy v CD
 				highlightCell(targetParent.matchedClassId);
 			}
-			
-			// // Add a new edge (line) between msg.matchedClassId and msg.id for each message  // TODO na pridanie ciary? 
-			// const newEdgeId = "custom_edge_" + msg.matchedClassId + "_" + msg.id;
-			// // Find the CD layer as parent
-			// const cdLayer = cells.find(cell => cell.getAttribute("value") === "CD");
-			// const parentId = cdLayer ? cdLayer.getAttribute("id") : null;
-			// // Create the new mxCell element
-			// const edgeElem = xmlDoc.createElement("mxCell");
-			// edgeElem.setAttribute("id", newEdgeId);
-			// edgeElem.setAttribute("edge", "1");
-			// edgeElem.setAttribute("source", msg.matchedClassId);
-			// edgeElem.setAttribute("target", msg.id);
-			// if (parentId) edgeElem.setAttribute("parent", parentId);
-			// // Optionally, set a style for visibility
-			// edgeElem.setAttribute("style", "strokeColor=#FF0000;endArrow=block;");
-			// // Add geometry for the edge
-			// const geomElem = xmlDoc.createElement("mxGeometry");
-			// geomElem.setAttribute("relative", "1");
-			// geomElem.setAttribute("as", "geometry");
-			// edgeElem.appendChild(geomElem);
-			// // Append to the XML root
-			// xmlDoc.documentElement.appendChild(edgeElem);
-
+			if (targetParent.matchedClassId && targetParent.id) { 			// zlta sipka medzi triedou v CD a lifeline blokom v SqD
+				addInterDiagramLink(targetParent.matchedClassId, targetParent.id);
+			}
 			wait();
 		}
 
 		// Animate a return step
 		function animateReturnStep(msg, sourceParent, targetParent) {
 			const matchingCall = findMatchingCall(msg);
-			if (!highlighted.has(msg.id)) {
+			if (!highlighted.has(msg.id)) { 								// highlight return sipky v SqD
 				highlightArrow(msg.id);
 			}
 			wait();
-			if (matchingCall.matchedClassId && highlighted.has(matchingCall.matchedClassId)) {
+			if (matchingCall.matchedClassId && highlighted.has(matchingCall.matchedClassId)) { // UNhighlight metody v CD
 				unhighlight(matchingCall.matchedClassId);
 			}
-			if (matchingCall.id && highlighted.has(matchingCall.id)) {
+			if (matchingCall.id && highlighted.has(matchingCall.id)) { 		// UNhighlight sipky ktora predstavuje volanie metody v SqD 
 				unhighlight(matchingCall.id);
 			}
-			if (sourceParent.id && highlighted.has(sourceParent.id)) {
+			if (matchingCall.matchedClassId && matchingCall.id) { 			// zmaze zltu sipku medzi metodou v CD a sipkou v SqD
+				removeInterDiagramLink(matchingCall.matchedClassId, matchingCall.id);
+			}
+			if (sourceParent.id && highlighted.has(sourceParent.id)) { 		// UNhighlight lifeline bloku v SqD
 				unhighlight(sourceParent.id);
 			}
-			if (msg.source && highlighted.has(msg.source)) {
+			if (msg.source && highlighted.has(msg.source)) { 				// UNhighlight lifeline bloku v SqD
 				unhighlight(msg.source);
 			}
-			if (sourceParent.matchedClassId && isClassEmpty(sourceParent.matchedClassId)) {
+			if (sourceParent.matchedClassId && isClassEmpty(sourceParent.matchedClassId)) { // UNhighlight triedy v CD ak nema ziadnu vysvietenu metodu
 				unhighlight(sourceParent.matchedClassId);
+				
+				if (sourceParent.matchedClassId && sourceParent.id) { 		// zmaze zltu sipku medzi triedou v CD a lifeline blokom v SqD
+					removeInterDiagramLink(sourceParent.matchedClassId, sourceParent.id);
+				}
 			}
-			if (highlighted.has(msg.id)) {
+			if (highlighted.has(msg.id)) { 									// UNhighlight return sipky v SqD
 				unhighlight(msg.id);
 			}
 			const relation = findRelationBetweenClasses(targetParent.matchedClassId, sourceParent.matchedClassId);
 			if (relation && highlighted.has(relation.id)) {
-				unhighlight(relation.id);
+				unhighlight(relation.id);									// UNhighlight sipky medzi triedami v CD
 			}
 			wait();
 		}
@@ -623,6 +622,9 @@ Draw.loadPlugin(function(editorUi)
 
 			console.log(cdRelations);
 			return cdRelations.find(r => r.source === sourceId && r.target === targetId);
+
+			// TODO poriesit ze ci vrati jednu alebo aj viac, to bude hadzat errory ptm, najskor nech berie primarne asi to co tam ma a ptm budem vynucovat ze nech bere triedu nech viem 
+			// ked tak priamo z metody to zobrat, ked tak pridat aj obojsmerne ze ked najde sipku opacne, bo idk aj tak sa moze stat ze ju niekto spravi
 		}
 	}
 

@@ -188,6 +188,78 @@ Draw.loadPlugin(function(editorUi)
 						{
 							if (tokens.length > 1)
 							{
+								// Handle 'add id1 id2' command to add a yellow arrow between diagrams
+								if (tokens[0] === 'add' && tokens.length > 2) {
+									var source = mapping[tokens[1]];
+									var target = mapping[tokens[2]];
+									if (source && target) {
+										graph.getModel().beginUpdate();
+										console.log("[customAnimation] Adding link between: ", source, target);
+										try {
+											var parent = graph.getDefaultParent();
+											var edge = graph.insertEdge(
+												parent,
+												null,
+												'',
+												source,
+												target,
+												// 'strokeColor=#ffeb3b;strokeWidth=3;endArrow=block;endFill=1;endSize=13;edgeStyle=orthogonalEdgeStyle;elbow=vertical;sourcePerimeter=1;entryX=0.5;entryY=0;entryPerimeter=1;'
+												'strokeColor=#ffeb3b;strokeWidth=3;endArrow=block;endFill=1;endSize=13;sourcePerimeter=1;entryX=0.5;entryY=0;entryPerimeter=1;'
+											);
+										} catch (e) {
+											console.error('[customAnimation] Error inserting edge:', e);
+										} finally {
+											graph.getModel().endUpdate();
+										}
+									} else {
+										console.warn('[customAnimation] Could not find source or target cell for add command:', tokens[1], tokens[2]);
+									}
+									step++;
+									next();
+									return;
+								}
+								// Handle 'remove id1 id2' command to remove a yellow arrow between diagrams
+								else if (tokens[0] === 'remove' && tokens.length > 2) {
+									console.log('[customAnimation] REMOVE command detected:', tokens);
+									var source = mapping[tokens[1]];
+									var target = mapping[tokens[2]];
+									if (source && target) {
+										var edgesToRemove = [];
+										// Iterate all cells to find matching yellow edges
+										for (var id in graph.getModel().cells) {
+											var cell = graph.getModel().cells[id];
+											if (
+												graph.getModel().isEdge(cell) &&
+												graph.getModel().getTerminal(cell, true) === source &&
+												graph.getModel().getTerminal(cell, false) === target
+											) {
+												var style = graph.getCellStyle(cell);
+												if (style['strokeColor'] === '#ffeb3b') {
+													edgesToRemove.push(cell);
+												}
+											}
+										}
+										if (edgesToRemove.length > 0) {
+											graph.getModel().beginUpdate();
+											try {
+												graph.removeCells(edgesToRemove);
+												console.log('[customAnimation] Removed yellow edge(s):', edgesToRemove);
+											} catch (e) {
+												console.error('[customAnimation] Error removing edge(s):', e);
+											} finally {
+												graph.getModel().endUpdate();
+											}
+										} else {
+											console.warn('[customAnimation] No yellow edge found between', tokens[1], tokens[2]);
+										}
+									} else {
+										console.warn('[customAnimation] Could not find source or target cell for remove command:', tokens[1], tokens[2]);
+									}
+									step++;
+									next();
+									return;
+								}
+
 								var cell = mapping[tokens[1]];
 								
 								if (cell != null)
