@@ -7,28 +7,68 @@ Draw.loadPlugin(function(editorUi)
 	mxResources.parse('generateCustomAnim=Generate Custom Animation...');
 
 	function generateAnimation() {
-		// Function to extract XML from the current diagram
+		const { xmlDoc, sqdCells, cdCells } = parseDiagramXml(editorUi);
+		
+		const [lifelines, sqdMessages, fragments] = parseSequenceDiagram(sqdCells, cdCells);
+		const cdRelations = parseClassDiagram(sqdCells, cdCells);
+
+		// For now, just log the fragments. You can use them as needed downstream.
+		console.log("[generateCustomAnim] Sequence fragments:", fragments);
+		
+		var animationScript = buildAnimationScript(lifelines, sqdMessages, cdRelations, cdCells);
+	
+		return animationScript;
+	}
+
+	function parseDiagramXml(editorUi) {
 		var xml = editorUi.getFileData();
 		var parser = new DOMParser();
 		var xmlDoc = parser.parseFromString(xml, "text/xml");
 	       
 		console.log("[generateCustomAnim] parseDiagramXml: parsed XML document\n", xml);
 
-		// Find all mxCell elements
 		var cells = Array.from(xmlDoc.getElementsByTagName("mxCell"));
 
-		const sqdCells = getDiagramCells(cells, "SqD")  // SqD - name of layer for sequence diagram 
+		const sqdCells = getDiagramCells(cells, "SqD")   // SqD - name of layer for sequence diagram
 		const cdCells  = getDiagramCells(cells, "CD");   //  CD - name of layer for class diagram
-		
-		const [lifelines, sqdMessages] = parseSequenceDiagram(sqdCells, cdCells); 
-		const cdRelations = parseClassDiagram(sqdCells, cdCells);
-		
-		var animationScript = buildAnimationScript(lifelines, sqdMessages, cdRelations, cdCells, cells);
-	
-		return animationScript;
+
+		return { xmlDoc, sqdCells, cdCells };
 	}
 
-	function parseSequenceDiagram(sqdCells, cdCells) {		
+	function parseSequenceDiagram(sqdCells, cdCells) {
+		// Extract alt/loop/opt elements and their children
+		function extractFragments(cells) {
+			const fragmentTypes = ['alt', 'loop', 'opt'];
+			const fragments = [];
+
+			// Helper: recursively collect all descendants of a cell
+			function collectChildren(parentId) {
+				const children = [];
+				cells.forEach(cell => {
+					if (cell.getAttribute("parent") === parentId) {
+						children.push(cell);
+						children.push(...collectChildren(cell.getAttribute("id")));
+					}
+				});
+				return children;
+			}
+
+			cells.forEach(cell => {
+				const value = (cell.getAttribute("value") || "").toLowerCase();
+				if (fragmentTypes.includes(value)) {
+					const fragment = {
+						id: cell.getAttribute("id"),
+						value: value,
+						children: collectChildren(cell.getAttribute("id"))
+					};
+					fragments.push(fragment);
+				}
+			});
+			return fragments;
+		}
+
+		const fragments = extractFragments(sqdCells);
+
 		// Extract lifelines from cells
 		function extractLifelines(cells, getAbsolutePosition) {
 			// Helper: Compute absolute position for a cell by summing up parent geometries
@@ -48,6 +88,7 @@ Draw.loadPlugin(function(editorUi)
 				return { x, y };
 			}
 
+			
 			return cells.filter(cell =>
 				cell.getAttribute("style") && cell.getAttribute("style").includes("shape=umlLifeline")
 			).map(cell => {
@@ -57,13 +98,17 @@ Draw.loadPlugin(function(editorUi)
 						c.getAttribute("parent") === cell.getAttribute("id") &&
 						(!c.getAttribute("style") || !c.getAttribute("style").includes("shape=umlLifeline"))
 					)
+					.filter(c => {
+						const geoElem = c.getElementsByTagName("mxGeometry")[0];
+						if (!geoElem) return false;
+						const width = parseFloat(geoElem.getAttribute("width")) || 0;
+						const height = parseFloat(geoElem.getAttribute("height")) || 0;
+						return width > 0 && height > 0;
+					})
 					.map(c => {
 						const geoElem = c.getElementsByTagName("mxGeometry")[0];
-						let width = 0, height = 0;
-						if (geoElem) {
-							width = parseFloat(geoElem.getAttribute("width")) || 0;
-							height = parseFloat(geoElem.getAttribute("height")) || 0;
-						}
+						const width = parseFloat(geoElem.getAttribute("width"));
+						const height = parseFloat(geoElem.getAttribute("height"));
 						const abs = getAbsolutePosition(c);
 						return {
 							id: c.getAttribute("id"),
@@ -73,48 +118,13 @@ Draw.loadPlugin(function(editorUi)
 							height
 						};
 					});
+
 				return {
 					id: cell.getAttribute("id"),
 					label: cell.getAttribute("value"),
 					parent: cell.getAttribute("parent"),
 					rectangles: rectangles
 				};
-			});
-		}
-
-		// Assign source and target lifeline IDs based on sourcePoint and targetPoint
-		function assignMessageEndpoints(messages, lifelines) {
-			// Helper: Check if point is inside a rectangle with optional padding
-			function pointInRect(point, rect, padding = 20) {
-				return point.x >= rect.x - padding &&
-					point.x <= rect.x + rect.width + padding &&
-					point.y >= rect.y - padding &&
-					point.y <= rect.y + rect.height + padding;
-			}
-
-			messages.forEach(msg => {
-				if (!msg.source && msg.sourcePoint) {
-					for (const lf of lifelines) {
-						for (const rect of lf.rectangles) {
-							if (rect && pointInRect(msg.sourcePoint, rect)) {
-								msg.source = rect.id;
-								break;
-							}
-						}
-						if (msg.source) break;
-					}
-				}
-				if (!msg.target && msg.targetPoint) {
-					for (const lf of lifelines) {
-						for (const rect of lf.rectangles) {
-							if (rect && pointInRect(msg.targetPoint, rect)) {
-								msg.target = rect.id;
-								break;
-							}
-						}
-						if (msg.target) break;
-					}
-				}
 			});
 		}
 
@@ -150,21 +160,48 @@ Draw.loadPlugin(function(editorUi)
 			}
 		});
 
-		// Extract sourcePoint and targetPoint for each message from mxGeometry or mxPoint
+
+		// Helper: Check if point is inside a rectangle with optional padding
+		function pointInRect(point, rect, padding = 20) {
+			return point.x >= rect.x - padding &&
+				point.x <= rect.x + rect.width + padding &&
+				point.y >= rect.y - padding &&
+				point.y <= rect.y + rect.height + padding;
+		}
+
+		// Helper: Compute absolute position for a point in a cell by summing up parent geometries
+		function getAbsolutePoint(cell, point) {
+			if (!point) return null;
+			let absX = point.x;
+			let absY = point.y;
+			let current = cell;
+			while (current) {
+				const geoElem = current.getElementsByTagName("mxGeometry")[0];
+				if (geoElem) {
+					absX += parseFloat(geoElem.getAttribute("x")) || 0;
+					absY += parseFloat(geoElem.getAttribute("y")) || 0;
+				}
+				const parentId = current.getAttribute("parent");
+				if (!parentId) break;
+				current = sqdCells.find(c => c.getAttribute("id") === parentId);
+			}
+			return { x: absX, y: absY };
+		}
+
 		messages.forEach(msg => {
-			var cell = sqdCells.find(c => c.getAttribute("id") === msg.id);
+			const cell = sqdCells.find(c => c.getAttribute("id") === msg.id);
 			if (!cell) {
 				console.warn("[generateCustomAnim] parseDiagramXml: No cell found for message id", msg.id);
 				return;
 			}
 
-			var geometry = cell.getElementsByTagName("mxGeometry")[0];
+			const geometry = cell.getElementsByTagName("mxGeometry")[0];
 			if (!geometry) {
 				console.warn("[generateCustomAnim] parseDiagramXml: No geometry found for message id", msg.id);
 				return;
 			}
 
-			var mxPoints = geometry.getElementsByTagName("mxPoint");
+			const mxPoints = geometry.getElementsByTagName("mxPoint");
 			let sourcePointElem = null, targetPointElem = null;
 			for (let i = 0; i < mxPoints.length; i++) {
 				const asAttr = mxPoints[i].getAttribute("as");
@@ -172,33 +209,138 @@ Draw.loadPlugin(function(editorUi)
 				if (asAttr === "targetPoint") targetPointElem = mxPoints[i];
 			}
 
-			msg.sourcePoint = sourcePointElem ? {
+			let sourcePoint = sourcePointElem ? {
 				x: parseFloat(sourcePointElem.getAttribute("x")),
 				y: parseFloat(sourcePointElem.getAttribute("y"))
 			} : null;
 
-			msg.targetPoint = targetPointElem ? {
+			let targetPoint = targetPointElem ? {
 				x: parseFloat(targetPointElem.getAttribute("x")),
 				y: parseFloat(targetPointElem.getAttribute("y"))
 			} : null;
 
 			// Fallback to geometry x,y if sourcePoint or targetPoint is null
-			if (!msg.sourcePoint && geometry.getAttribute("x") && geometry.getAttribute("y")) {
-				msg.sourcePoint = {
+			if (!sourcePoint && geometry.getAttribute("x") && geometry.getAttribute("y")) {
+				sourcePoint = {
 					x: parseFloat(geometry.getAttribute("x")),
 					y: parseFloat(geometry.getAttribute("y"))
 				};
 			}
-			if (!msg.targetPoint && geometry.getAttribute("x") && geometry.getAttribute("y")) {
-				msg.targetPoint = {
+			if (!targetPoint && geometry.getAttribute("x") && geometry.getAttribute("y")) {
+				targetPoint = {
 					x: parseFloat(geometry.getAttribute("x")),
 					y: parseFloat(geometry.getAttribute("y"))
 				};
+			}
+
+			msg.sourcePoint = getAbsolutePoint(cell, sourcePoint);
+			msg.targetPoint = getAbsolutePoint(cell, targetPoint);
+
+			// Prefer Draw.io reference: if msg.source matches a rectangle's id, assign directly
+			if (!msg.source && msg.sourcePoint) {
+				let foundByReference = false;
+				for (const lf of lifelines) {
+					for (const rect of lf.rectangles) {
+						if (rect && msg.source && rect.id === msg.source) {
+							// Direct reference match
+							msg.source = rect.id;
+							foundByReference = true;
+							break;
+						}
+					}
+					if (foundByReference) break;
+				}
+				// Fallback: geometric proximity with generous padding
+				if (!foundByReference) {
+					console.log("not found by reference")
+					for (const lf of lifelines) {
+						for (const rect of lf.rectangles) {
+							const rectCell = sqdCells.find(c => c.getAttribute("id") === rect.id);
+							let absRect = rect;
+							console.log("if rectCell")
+							if (rectCell) {
+								let abs = { x: rect.x, y: rect.y };
+								let current = rectCell;
+								while (current) {
+									const geoElem = current.getElementsByTagName("mxGeometry")[0];
+									if (geoElem) {
+										abs.x += parseFloat(geoElem.getAttribute("x")) || 0;
+										abs.y += parseFloat(geoElem.getAttribute("y")) || 0;
+									}
+									const parentId = current.getAttribute("parent");
+									if (!parentId) break;
+									current = sqdCells.find(c => c.getAttribute("id") === parentId);
+								}
+								absRect = {
+									...rect,
+									x: abs.x,
+									y: abs.y
+								};
+								console.log("absRect")
+								console.log(absRect)
+								console.log("msg.sourcePoint")
+								console.log(msg.sourcePoint)
+							}
+							// Use a larger padding for fuzzy matching
+							if (rect && pointInRect(msg.sourcePoint, absRect, 40)) {
+								msg.source = rect.id;
+								break;
+							}
+						}
+						if (msg.source) break;
+					}
+				}
+			}
+			// Prefer Draw.io reference: if msg.target matches a rectangle's id, assign directly
+			if (!msg.target && msg.targetPoint) {
+				let foundByReference = false;
+				for (const lf of lifelines) {
+					for (const rect of lf.rectangles) {
+						if (rect && msg.target && rect.id === msg.target) {
+							// Direct reference match
+							msg.target = rect.id;
+							foundByReference = true;
+							break;
+						}
+					}
+					if (foundByReference) break;
+				}
+				// Fallback: geometric proximity with generous padding
+				if (!foundByReference) {
+					for (const lf of lifelines) {
+						for (const rect of lf.rectangles) {
+							const rectCell = sqdCells.find(c => c.getAttribute("id") === rect.id);
+							let absRect = rect;
+							if (rectCell) {
+								let abs = { x: rect.x, y: rect.y };
+								let current = rectCell;
+								while (current) {
+									const geoElem = current.getElementsByTagName("mxGeometry")[0];
+									if (geoElem) {
+										abs.x += parseFloat(geoElem.getAttribute("x")) || 0;
+										abs.y += parseFloat(geoElem.getAttribute("y")) || 0;
+									}
+									const parentId = current.getAttribute("parent");
+									if (!parentId) break;
+									current = sqdCells.find(c => c.getAttribute("id") === parentId);
+								}
+								absRect = {
+									...rect,
+									x: abs.x,
+									y: abs.y
+								};
+							}
+							// Use a larger padding for fuzzy matching
+							if (rect && pointInRect(msg.targetPoint, absRect, 40)) {
+								msg.target = rect.id;
+								break;
+							}
+						}
+						if (msg.target) break;
+					}
+				}
 			}
 		});
-
-		assignMessageEndpoints(messages, lifelines);
-
 
 		// Find the starting lifeline: no incoming arrow from the left
 		function isIncomingFromLeft(msg, lifelineId) {
@@ -223,7 +365,9 @@ Draw.loadPlugin(function(editorUi)
 		console.log("Lifelines:", lifelines);
 		console.log("Messages/Arrows:", messages);
 
-		return [lifelines, messages]; 
+		console.log("[generateCustomAnim] Fragments (alt/loop/opt):", fragments);
+
+		return [lifelines, messages, fragments];
 	}
 
 	function parseClassDiagram(sqdCells, cdCells) {
@@ -376,13 +520,34 @@ Draw.loadPlugin(function(editorUi)
 			});
 		}
 		collectDescendants(layerId);
-		return cells.filter(cell =>
-			cell.getAttribute("id") === layerId || descendantIds.has(cell.getAttribute("id"))
-		);
+
+		return cells.filter(cell => {
+			// Always include the layer itself
+			if (cell.getAttribute("id") === layerId) {
+				return true;
+			}
+
+			// Only process descendants
+			if (!descendantIds.has(cell.getAttribute("id"))) {
+				return false;
+			}
+
+			// Check visibility: if 'visible' attribute is "0", it's hidden. Otherwise, it's visible.
+			const isVisible = cell.getAttribute("visible") !== "0";
+
+			// Check dimensions
+			const geoElem = cell.getElementsByTagName("mxGeometry")[0];
+			const hasPositiveDimensions = geoElem &&
+				parseFloat(geoElem.getAttribute("width")) > 0 &&
+				parseFloat(geoElem.getAttribute("height")) > 0;
+
+			// Filter based on the condition: visible OR has positive dimensions
+			return isVisible || hasPositiveDimensions;
+		});
 	}
 
 	// Build the animation script for the animation.js plugin
-	function buildAnimationScript(lifelines, messages, cdRelations, cdCells, cells) {
+	function buildAnimationScript(lifelines, messages, cdRelations, cdCells) {
 		// Build a map from source to messages for quick traversal
 		var sourceMap = new Map();
 		var targetSet = new Set();
@@ -606,11 +771,9 @@ Draw.loadPlugin(function(editorUi)
 			for (const msg of messages) {
 				const method = cdCells.find(c => c.getAttribute("id") === msg.matchedClassId);
 				if (method && method.getAttribute("parent") === classId && highlighted.has(method.getAttribute("id") )) {
-					console.log("return FALSE")
 					return false;
 				}
 			}
-			console.log("return TRUE")
 			return true;
 		}
 
@@ -623,15 +786,14 @@ Draw.loadPlugin(function(editorUi)
 			console.log(cdRelations);
 			return cdRelations.find(r => r.source === sourceId && r.target === targetId);
 
-			// TODO poriesit ze ci vrati jednu alebo aj viac, to bude hadzat errory ptm, najskor nech berie primarne asi to co tam ma a ptm budem vynucovat ze nech bere triedu nech viem 
-			// ked tak priamo z metody to zobrat, ked tak pridat aj obojsmerne ze ked najde sipku opacne, bo idk aj tak sa moze stat ze ju niekto spravi
+			// TODO 
 		}
 	}
 
 	editorUi.actions.addAction('generateCustomAnim', function() {
 		var animation = generateAnimation();
 
-        // // Save as a text file (one label per line)
+        // Save as a text file (one label per line)
 		var blob = new Blob([animation], {type: 'text/plain'});
 		var a = document.createElement('a');
 		a.href = URL.createObjectURL(blob);

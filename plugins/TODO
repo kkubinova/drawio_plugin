@@ -1,0 +1,10 @@
+TODO
+
+findRelationBetweenClasses()
+    -   poriesit ze ci vrati jednu alebo aj viac, to bude hadzat errory ptm, najskor nech berie primarne asi to co tam ma a ptm budem vynucovat ze nech bere triedu nech 
+        viem ked tak priamo z metody to zobrat, ked tak pridat aj obojsmerne ze ked najde sipku opacne, bo idk aj tak sa moze stat ze ju niekto spravi
+
+alty, opty, loopy
+
+sipky nech sa spravne vypocitaju kam patria
+
