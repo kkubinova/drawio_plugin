@@ -368,7 +368,7 @@ Draw.loadPlugin(function(editorUi)
 		var sortedMessages = messages
 			.filter(msg => msg.sourcePoint)
 			.sort((a, b) => {
-				return a.sourcePoint.x - b.sourcePoint.x && a.sourcePoint.y - b.sourcePoint.y
+				return a.sourcePoint.y - b.sourcePoint.y
 			});
 
 		var fragments = new Stack();
