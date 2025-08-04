@@ -12,9 +12,9 @@ Draw.loadPlugin(function(editorUi)
 		console.log("fileJson: \n", fileJson);
 
 		const [lifelines, sqdMessages, fragments] = parseSequenceDiagram(sqdCells, cdCells, fileJson);
-		const cdRelations = parseClassDiagram(sqdCells, cdCells);
+		const [cdClasses, cdRelations] = parseClassDiagram(sqdCells, cdCells);
 
-		var animationScript = buildAnimationScript(lifelines, sqdMessages, cdRelations, cdCells);
+		var animationScript = buildAnimationScript(lifelines, sqdMessages, cdClasses, cdRelations, cdCells);
 	
 		return animationScript;
 	}
@@ -34,12 +34,12 @@ Draw.loadPlugin(function(editorUi)
 		return { xmlDoc, sqdCells, cdCells };
 	}
 
-	// Extract lifelines from cells
+	// Helper to extract lifeline with its activation bars
 	function extractLifelines(cells) {			
 		return cells.filter(cell =>
 			cell.getAttribute("style") && cell.getAttribute("style").includes("shape=umlLifeline")
 		).map(cell => {
-			const rectangles = cells
+			const activationBars = cells
 				.filter(c =>
 					c.getAttribute("vertex") === "1" &&
 					c.getAttribute("parent") === cell.getAttribute("id") &&
@@ -54,16 +54,16 @@ Draw.loadPlugin(function(editorUi)
 				})
 				.map(c => {
 					const geoElem = c.getElementsByTagName("mxGeometry")[0];
-					const width = parseFloat(geoElem.getAttribute("width"));
-					const height = parseFloat(geoElem.getAttribute("height"));
 					const x = parseFloat(geoElem.getAttribute("x"));
 					const y = parseFloat(geoElem.getAttribute("y"));
+					const width = parseFloat(geoElem.getAttribute("width"));
+					const height = parseFloat(geoElem.getAttribute("height"));
 					return {
 						id: c.getAttribute("id"),
-						x,
-						y,
-						width,
-						height
+						x: x,
+						y: y,
+						widht: width,
+						height: height
 					};
 				});
 
@@ -71,7 +71,7 @@ Draw.loadPlugin(function(editorUi)
 				id: cell.getAttribute("id"),
 				label: cell.getAttribute("value"),
 				parent: cell.getAttribute("parent"),
-				rectangles: rectangles
+				activationBars: activationBars
 			};
 		});
 	}
@@ -79,7 +79,7 @@ Draw.loadPlugin(function(editorUi)
 	function parseSequenceDiagram(sqdCells, cdCells, fileJson) {
 		const fragments = fileJson;
 
-		// Extract lifelines (umlLifeline in style) from sqdCells
+		// Extract lifelines from sqdCells
 		var lifelines = extractLifelines(sqdCells);
 
 		// Match lifelines to classes by label 
@@ -99,18 +99,19 @@ Draw.loadPlugin(function(editorUi)
 			parent: cell.getAttribute("parent"),
 			source: cell.getAttribute("source"),
 			target: cell.getAttribute("target"),
-			dashed: cell.getAttribute("style").includes("dashed=1"),
+			dashed: cell.getAttribute("style").includes("dashed=1"), // true / false
 			fragment: "",
 			fragmentParent: "",
 			subFragment: ""
 		}));
 
 		// Add fragment reference to message/arrow
-		function isIdInFragmentLines(subFragment, targetId) {
-			return subFragment.lines?.some(line => line.id === targetId);
-		}
 		messages.forEach(msg => {
 			fragments.forEach(fragment => {
+				function isIdInFragmentLines(subFragment, targetId) {
+					return subFragment.lines?.some(line => line.id === targetId);
+				}
+
 				fragment.child_areas.forEach(subFragment => {
 					if (isIdInFragmentLines(subFragment, msg.id)) {
 						msg.subFragment = subFragment.id;
@@ -123,34 +124,15 @@ Draw.loadPlugin(function(editorUi)
 
 		// Match messages to methods in matched class
 		messages.forEach(msg => {
-			const msgLabel = msg.label.replace(/\s*\([^)]*\)/, '').trim()
+			const msgLabel = msg.label.replace(/\s*\([^)]*\)/, '').trim() // remove () from message label to match method name in a class
 
 			const match = cdCells.find(cell => cell.getAttribute("value") && msgLabel && cell.getAttribute("value").includes(msgLabel));
 			if (match) {
-				msg.matchedClassId = match.getAttribute("id");
+				msg.matchedMethodId = match.getAttribute("id");
 			}
 		});
 
-		// Helper: Compute absolute position for a point in a cell by summing up parent geometries
-		function getAbsolutePoint(cell, point) {
-			if (!point) return null;
-			let absX = point.x;
-			let absY = point.y;
-			let current = cell;
-			while (current) {
-				const geoElem = current.getElementsByTagName("mxGeometry")[0];
-				if (geoElem) {
-					absX += parseFloat(geoElem.getAttribute("x")) || 0;
-					absY += parseFloat(geoElem.getAttribute("y")) || 0;
-				}
-				const parentId = current.getAttribute("parent");
-				if (!parentId) break;
-				current = sqdCells.find(c => c.getAttribute("id") === parentId);
-			}
-			return { x: absX, y: absY };
-		}
-
-		// Add source and target lifeline block to message/arrow // TODO
+		// Add position of source and target lifeline block to message/arrow 
 		messages.forEach(msg => {
 			const cell = sqdCells.find(c => c.getAttribute("id") === msg.id);
 			const geometry = cell.getElementsByTagName("mxGeometry")[0];
@@ -175,66 +157,9 @@ Draw.loadPlugin(function(editorUi)
 				y: parseFloat(targetPointElem.getAttribute("y"))
 			} : null;
 
-			// Fallback to geometry x,y if sourcePoint or targetPoint is null
-			if (!sourcePoint && geometry.getAttribute("x") && geometry.getAttribute("y")) {
-				sourcePoint = {
-					x: parseFloat(geometry.getAttribute("x")),
-					y: parseFloat(geometry.getAttribute("y"))
-				};
-			}
-			if (!targetPoint && geometry.getAttribute("x") && geometry.getAttribute("y")) {
-				targetPoint = {
-					x: parseFloat(geometry.getAttribute("x")),
-					y: parseFloat(geometry.getAttribute("y"))
-				};
-			}
-
-			msg.sourcePoint = getAbsolutePoint(cell, sourcePoint);
-			msg.targetPoint = getAbsolutePoint(cell, targetPoint);
-
-			// If msg.source matches a rectangle's id, assign directly 
-			if (!msg.source && msg.sourcePoint) {
-				for (const lf of lifelines) {
-					for (const rect of lf.rectangles) {
-						if (rect && msg.source && rect.id === msg.source) {
-							msg.source = rect.id;
-							break;
-						}
-					}
-				}
-			}
-			// If msg.target matches a rectangle's id, assign directly
-			if (!msg.target && msg.targetPoint) {
-				for (const lf of lifelines) {
-					for (const rect of lf.rectangles) {
-						if (rect && msg.target && rect.id === msg.target) {
-							msg.target = rect.id;
-							break;
-						}
-					}
-				}
-			}
+			msg.sourcePoint = sourcePoint;
+			msg.targetPoint = targetPoint;
 		});
-
-		// Find the starting lifeline: no incoming arrow from the left
-		function isIncomingFromLeft(msg, lifelineId) {
-			if (msg.target !== lifelineId) return false;
-			if (!msg.sourcePoint || !msg.targetPoint) return false;
-			return msg.sourcePoint.x < msg.targetPoint.x;
-		}
-
-		var lifelineIds = lifelines.map(lf => lf.id);
-		var lifelineHasIncomingLeft = {};
-		lifelineIds.forEach(id => lifelineHasIncomingLeft[id] = false);
-
-		messages.forEach(msg => {
-			lifelineIds.forEach(id => {
-				if (isIncomingFromLeft(msg, id)) {
-					lifelineHasIncomingLeft[id] = true;
-				}
-			});
-		});
-
 
 		console.log("Lifelines:", lifelines);
 		console.log("Messages/Arrows:", messages);
@@ -244,58 +169,63 @@ Draw.loadPlugin(function(editorUi)
 	}
 
 	function parseClassDiagram(sqdCells, cdCells) {
-		// Find the CD layer id (parent for all class blocks)
+		// Find the CD layer id (parent for all class elements)
 		const cdLayer = cdCells.find(cell => cell.getAttribute("value") === "CD");
 		const cdLayerId = cdLayer ? cdLayer.getAttribute("id") : null;
 		if (!cdLayerId) return;
 
 		// Find all class elements whose parent is cdLayerId
-		const classElements = cdCells.filter(cell =>
+		const classes = cdCells
+		.filter(cell =>
 			cell.getAttribute("parent") === cdLayerId &&
 			cell.getAttribute("vertex") === "1"
-		);
+		)
+		.map(cell => {
+			const id = cell.getAttribute("id");
+			const children = cdCells
+				.filter(child => child.getAttribute("parent") === id)
+				.map(child => child.getAttribute("id"));
+
+			return {
+				id,
+				label: cell.getAttribute("value"),
+				parent: cell.getAttribute("parent"),
+				children,
+				geometry: cell.getElementsByTagName("mxGeometry")[0],
+			};
+		});
+		console.log("classes")
+		console.log(classes)
 
 		// Helper to get absolute position of a cell by summing up parent geometries
 		function getAbsolutePosition(cell) {
 			let x = 0, y = 0;
 			let current = cell;
 			while (current) {
-				const geoElem = current.getElementsByTagName("mxGeometry")[0];
+				const geoElem = current.geometry;
 				if (geoElem) {
 					x += parseFloat(geoElem.getAttribute("x")) || 0;
 					y += parseFloat(geoElem.getAttribute("y")) || 0;
 				}
-				const parentId = current.getAttribute("parent");
+				const parentId = current.parent;
 				if (!parentId) break;
 				current = cdCells.find(c => c.getAttribute("id") === parentId);
 			}
 			return { x, y };
 		}
 
-		// Helper to find class element by id
-		function findClassElementForId(id) {
-			const cell = cdCells.find(c => c.getAttribute("id") === id);
-			if (!cell) return;
-			if (cell.getAttribute("parent") === cdLayerId) {
-				return id;
-			}
-
-			return findClassElementForId(cell.getAttribute("parent"));
+		// Helper to check if a point is inside a class with optional padding
+		function pointInClass(point, classRect, padding = 10) {
+			return point.x >= classRect.x - padding &&
+				point.x <= classRect.x + classRect.width + padding &&
+				point.y >= classRect.y - padding &&
+				point.y <= classRect.y + classRect.height + padding;
 		}
 
-		// Helper to check if a point is inside a rectangle with optional padding
-		function pointInRect(point, rect, padding = 10) {
-			return point.x >= rect.x - padding &&
-				point.x <= rect.x + rect.width + padding &&
-				point.y >= rect.y - padding &&
-				point.y <= rect.y + rect.height + padding;
-		}
-
-		// Extract arrows (edges) from class diagram cells
+		// Extract arrows (edges) from class diagram
 		var classArrows = cdCells.filter(cell =>
 			cell.getAttribute("edge") === "1"
 		).map(cell => {
-			// Get geometry element for arrow
 			const geometry = cell.getElementsByTagName("mxGeometry")[0];
 			let sourcePoint = null;
 			let targetPoint = null;
@@ -315,44 +245,29 @@ Draw.loadPlugin(function(editorUi)
 				}
 			}
 
-			// Fallback to geometry x,y if sourcePoint or targetPoint is null
-			if (!sourcePoint && geometry && geometry.getAttribute("x") && geometry.getAttribute("y")) {
-				sourcePoint = {
-					x: parseFloat(geometry.getAttribute("x")),
-					y: parseFloat(geometry.getAttribute("y"))
-				};
-			}
-			if (!targetPoint && geometry && geometry.getAttribute("x") && geometry.getAttribute("y")) {
-				targetPoint = {
-					x: parseFloat(geometry.getAttribute("x")),
-					y: parseFloat(geometry.getAttribute("y"))
-				};
-			}
-
-			// Find source and target class elements by id or by proximity to arrow endpoints
-			let sourceElem = findClassElementForId(cell.getAttribute("source"));
-			let targetElem = findClassElementForId(cell.getAttribute("target"));
+			let source = cell.getAttribute("source");
+			let target = cell.getAttribute("target");
 
 			// If source or target not found by id, try to find by proximity to arrow endpoints
-			if ((!sourceElem || !targetElem) && (sourcePoint && targetPoint)) {
-				for (const classElem of classElements) {
-					const geoElem = classElem.getElementsByTagName("mxGeometry")[0];
+			if ((!source || !target) && (sourcePoint && targetPoint)) {
+				for (const classElem of classes) {
+					const geoElem = classElem.geometry;
 					if (!geoElem) continue;
 					const absPos = getAbsolutePosition(classElem);
-					const rect = {
+					const classRect = {
 						x: absPos.x,
 						y: absPos.y,
 						width: parseFloat(geoElem.getAttribute("width")) || 0,
 						height: parseFloat(geoElem.getAttribute("height")) || 0
 					};
 
-					if (!sourceElem && pointInRect(sourcePoint, rect)) {
-						sourceElem = classElem.getAttribute("id");
+					if (!source && pointInClass(sourcePoint, classRect)) {
+						source = classElem.id;
 					}
-					if (!targetElem && pointInRect(targetPoint, rect)) {
-						targetElem = classElem.getAttribute("id");
+					if (!target && pointInClass(targetPoint, classRect)) {
+						target = classElem.id;
 					}
-					if (sourceElem && targetElem) break;
+					if (source && target) break;
 				}
 			}
 
@@ -360,15 +275,16 @@ Draw.loadPlugin(function(editorUi)
 				id: cell.getAttribute("id"),
 				label: cell.getAttribute("value"),
 				parent: cell.getAttribute("parent"),
-				// Use source and target class element ids if found, else fallback to original
-				source: sourceElem ? sourceElem : cell.getAttribute("source"),
-				target: targetElem ? targetElem : cell.getAttribute("target"),
+				source: source,
+				target: target,
 				style: cell.getAttribute("style") || ""
 			};
 		});
 
-		console.log("Class diagram arrows with source/target classes:\n", classArrows);
-		return classArrows;
+		console.log("CD classes:\n", classes);
+		console.log("CD relations:\n", classArrows);
+
+		return [classes, classArrows];
 	}
 
 	// Get all elements in diagramType (= SqD / CD) layer
@@ -404,7 +320,7 @@ Draw.loadPlugin(function(editorUi)
 				return false;
 			}
 
-			// Check visibility: if 'visible' attribute is "0", it's hidden. Otherwise, it's visible.
+			// Check visibility
 			const isVisible = cell.getAttribute("visible") !== "0";
 
 			// Check dimensions
@@ -419,7 +335,7 @@ Draw.loadPlugin(function(editorUi)
 	}
 
 	// Build the animation script for the animation.js plugin
-	function buildAnimationScript(lifelines, messages, cdRelations, cdCells) {
+	function buildAnimationScript(lifelines, messages, cdClasses, cdRelations, cdCells) {
 		// Build a map from source to messages for quick traversal
 		var sourceMap = new Map();
 		var targetSet = new Set();
@@ -470,7 +386,7 @@ Draw.loadPlugin(function(editorUi)
 						flow.push({
 							id: msg.id,
 							label: msg.label,
-							matchedClassId: msg.matchedClassId,
+							matchedMethodId: msg.matchedMethodId,
 							source: msg.source,
 							target: msg.target,
 							fragment: msg.fragment,
@@ -481,12 +397,12 @@ Draw.loadPlugin(function(editorUi)
 					else {
 						if (msg.fragment === fragments.peek()) {
 							// console.log("msg.fragment === fragments.peek()")
-							if (msg.subFragment === subFragments.peek()) {
+							if (msg.subFragment === subFragments.peek()) { // animate only objects in first subfragment
 								// console.log("msg.subFragment === subFragments.peek()")
 								flow.push({
 									id: msg.id,
 									label: msg.label,
-									matchedClassId: msg.matchedClassId,
+									matchedMethodId: msg.matchedMethodId,
 									source: msg.source,
 									target: msg.target,
 									fragment: msg.fragment,
@@ -506,7 +422,7 @@ Draw.loadPlugin(function(editorUi)
 							flow.push({
 								id: msg.id,
 								label: msg.label,
-								matchedClassId: msg.matchedClassId,
+								matchedMethodId: msg.matchedMethodId,
 								source: msg.source,
 								target: msg.target,
 								fragment: msg.fragment,
@@ -522,7 +438,7 @@ Draw.loadPlugin(function(editorUi)
 							flow.push({
 								id: msg.id,
 								label: msg.label,
-								matchedClassId: msg.matchedClassId,
+								matchedMethodId: msg.matchedMethodId,
 								source: msg.source,
 								target: msg.target,
 								fragment: msg.fragment,
@@ -540,7 +456,7 @@ Draw.loadPlugin(function(editorUi)
 					flow.push({
 						id: msg.id,
 						label: msg.label,
-						matchedClassId: msg.matchedClassId,
+						matchedMethodId: msg.matchedMethodId,
 						source: msg.source,
 						target: msg.target,
 						fragment: msg.fragment,
@@ -562,16 +478,17 @@ Draw.loadPlugin(function(editorUi)
 		let animationScript = "";
 		const highlighted = new Set();
 
-		function findLifelineByRectId(rectId) {
-			const found = lifelines.find(lf => lf.rectangles.some(r => r.id === rectId));
+		function findLifelineByBarId(barId) { 
+			const found = lifelines.find(lf => lf.activationBars.some(b => b.id === barId));
 			if (!found) {
-				console.warn("[generateCustomAnim] buildAnimationScript: No lifeline found for rectId", rectId);
+				console.warn("[generateCustomAnim] buildAnimationScript: No lifeline found for barId", barId);
 				return null;
 			}
 			return found;
 		}
 		
-		function findMatchingCall(msg) {
+		// Helper to find a call for a return arrow
+		function findMatchingCall(msg) { 
 			if (!msg.source || !msg.target) return null;
 			const reversed = calls.filter(call =>
 				call.source === msg.target &&
@@ -613,36 +530,40 @@ Draw.loadPlugin(function(editorUi)
 			animationScript += `remove ${sourceId} ${targetId}\n`;
 		}
 
-		const initialLfParent = findLifelineByRectId(flow[0].source);
-		const initialLf = flow[0].source;
-		const classElement = flow[0].matchedClassId;
+		const initialLifeline = findLifelineByBarId(flow[0].source);
+		const initialActivationBar = flow[0].source;
+		const classElement = initialLifeline.matchedClassId;
+		const methodElement = flow[0].matchedMethodId;
 
-		// Animate initial source lifeline block
-		if (initialLfParent.id && !highlighted.has(initialLfParent.id)) {
-			highlightCell(initialLfParent.id);
+		// Animate initial lifeline and activation bar
+		if (initialLifeline.id && !highlighted.has(initialLifeline.id)) {
+			highlightCell(initialLifeline.id);
 		}
-		if (initialLf && !highlighted.has(initialLf)) {
-			highlightCell(initialLf);
+		if (initialActivationBar && !highlighted.has(initialActivationBar)) {
+			highlightCell(initialActivationBar);
 		}
 		if (classElement && !highlighted.has(classElement)) {
 			highlightCell(classElement);
+		}
+		if (methodElement && !highlighted.has(methodElement)) {
+			highlightCell(methodElement);
 		}
 		wait();
 
 		var frag = [];
 
 		flow.forEach((msg) => {
-			const sourceParent = findLifelineByRectId(msg.source);
-			const targetParent = findLifelineByRectId(msg.target);
+			const sourceLifeline = findLifelineByBarId(msg.source);
+			const targetLifeline = findLifelineByBarId(msg.target);
 
-			if (msg.fragment !== "") { // todo ani toto neviem ci je ok
+			if (msg.fragment !== "") { // TODO ani toto neviem ci je ok
 				frag.push(msg.fragment);
 				animateFragment(msg.fragment);
 			}
 			if (calls.some(call => call.id === msg.id)) {
-				animateCallStep(msg, sourceParent, targetParent);
+				animateCall(msg, sourceLifeline, targetLifeline);
 			} else if (returns.some(ret => ret.id === msg.id)) {
-				animateReturnStep(msg, sourceParent, targetParent, frag);
+				animateReturn(msg, sourceLifeline, targetLifeline, frag);
 			}
 		});
 
@@ -654,76 +575,78 @@ Draw.loadPlugin(function(editorUi)
 			wait();			
 		}
 
-		// Animate a call step
-		function animateCallStep(msg, sourceParent, targetParent) {
-			if (!highlighted.has(msg.id)) { 								// highlight sipky v SqD
+		// Animate a call
+		function animateCall(msg, sourceLifeline, targetLifeline) {
+			if (!highlighted.has(msg.id)) { 									// highlight sipky v SqD
 				highlightArrow(msg.id);
 			}
-			if (sourceParent.matchedClassId && !highlighted.has(sourceParent.matchedClassId)) { // highlight source triedy v CD
-				highlightCell(sourceParent.matchedClassId);
+			if (sourceLifeline.matchedClassId && !highlighted.has(sourceLifeline.matchedClassId)) { // highlight source triedy v CD
+				highlightCell(sourceLifeline.matchedClassId);
 			}
-			if (msg.matchedClassId && !highlighted.has(msg.matchedClassId)) { // highlight metody v CD
-				highlightCell(msg.matchedClassId);
+			if (msg.matchedMethodId && !highlighted.has(msg.matchedMethodId)) { // highlight metody v CD
+				highlightCell(msg.matchedMethodId);
 			}
-			if (msg.matchedClassId && msg.id) {								// zlta sipka medzi metodou v CD a sipkou v SqD
-				addInterDiagramLink(msg.matchedClassId, msg.id);
+			if (msg.matchedMethodId && msg.id) {								// zlta sipka medzi metodou v CD a sipkou v SqD
+				addInterDiagramLink(msg.matchedMethodId, msg.id);
 			}
-			const relation = findRelationBetweenClasses(sourceParent.matchedClassId, targetParent.matchedClassId);
-			if (relation && !highlighted.has(relation.id)) { 				// highlight sipky medzi triedami v CD
+			const relation = findRelationBetweenClasses(sourceLifeline.matchedClassId, targetLifeline.matchedClassId);
+			if (relation && !highlighted.has(relation.id)) { 					// highlight sipky medzi triedami v CD
 				highlightArrow(relation.id);
 			}
 			wait();
-			if (targetParent.id && !highlighted.has(targetParent.id)) {		// highlight lifeline bloku v SqD
-				highlightCell(targetParent.id);
+			if (targetLifeline.id && !highlighted.has(targetLifeline.id)) {		// highlight lifeline bloku v SqD
+				highlightCell(targetLifeline.id);
 			}
-			if (msg.target && !highlighted.has(msg.target)) {				// highlight lifeline bloku v SqD
+			if (msg.target && !highlighted.has(msg.target)) {					// highlight lifeline bloku v SqD
 				highlightCell(msg.target);
 			}
-			if (targetParent.matchedClassId && !highlighted.has(targetParent.matchedClassId)) { // highlight target triedy v CD
-				highlightCell(targetParent.matchedClassId);
+			if (targetLifeline.matchedClassId && !highlighted.has(targetLifeline.matchedClassId)) { // highlight target triedy v CD
+				highlightCell(targetLifeline.matchedClassId);
 			}
-			if (targetParent.matchedClassId && targetParent.id) { 			// zlta sipka medzi triedou v CD a lifeline blokom v SqD
-				addInterDiagramLink(targetParent.matchedClassId, targetParent.id);
+			if (targetLifeline.matchedClassId && targetLifeline.id) { 			// zlta sipka medzi triedou v CD a lifeline blokom v SqD
+				addInterDiagramLink(targetLifeline.matchedClassId, targetLifeline.id);
 			}
 			wait();
 		}
 
 		// Animate a return step
-		function animateReturnStep(msg, sourceParent, targetParent, frag) {
+		function animateReturn(msg, sourceLifeline, targetLifeline, frag) {
 			const matchingCall = findMatchingCall(msg);
 			if (!highlighted.has(msg.id)) { 								// highlight return sipky v SqD
 				highlightArrow(msg.id);
 			}
 			wait();
 			if (msg.fragment !== "") {
-				frag.pop();
+				var fragPop = frag.pop()
+				if (frag.length === 0) {
+					unhighlight(fragPop)
+				}
 			}
-			if (matchingCall.matchedClassId && highlighted.has(matchingCall.matchedClassId)) { // UNhighlight metody v CD
-				unhighlight(matchingCall.matchedClassId);
+			if (matchingCall.matchedMethodId && highlighted.has(matchingCall.matchedMethodId)) { // UNhighlight metody v CD
+				unhighlight(matchingCall.matchedMethodId);
 			}
 			if (matchingCall.id && highlighted.has(matchingCall.id)) { 		// UNhighlight sipky ktora predstavuje volanie metody v SqD 
 				unhighlight(matchingCall.id);
 			}
-			if (matchingCall.matchedClassId && matchingCall.id) { 			// zmaze zltu sipku medzi metodou v CD a sipkou v SqD
-				removeInterDiagramLink(matchingCall.matchedClassId, matchingCall.id);
+			if (matchingCall.matchedMethodId && matchingCall.id) { 			// zmaze zltu sipku medzi metodou v CD a sipkou v SqD
+				removeInterDiagramLink(matchingCall.matchedMethodId, matchingCall.id);
 			}
-			if (sourceParent.id && highlighted.has(sourceParent.id)) { 		// UNhighlight lifeline bloku v SqD
-				unhighlight(sourceParent.id);
-			}
-			if (msg.source && highlighted.has(msg.source)) { 				// UNhighlight lifeline bloku v SqD
+			if (msg.source && highlighted.has(msg.source)) { 				// UNhighlight activation baru v SqD
 				unhighlight(msg.source);
 			}
-			if (sourceParent.matchedClassId && isClassEmpty(sourceParent.matchedClassId)) { // UNhighlight triedy v CD ak nema ziadnu vysvietenu metodu
-				unhighlight(sourceParent.matchedClassId);
-				
-				if (sourceParent.matchedClassId && sourceParent.id) { 		// zmaze zltu sipku medzi triedou v CD a lifeline blokom v SqD
-					removeInterDiagramLink(sourceParent.matchedClassId, sourceParent.id);
+			if (sourceLifeline.id && highlighted.has(sourceLifeline.id) && !hasHighlightedActivationBar(sourceLifeline.id)) { 	// UNhighlight lifeline bloku v SqD
+				unhighlight(sourceLifeline.id);
+			}
+			if (sourceLifeline.matchedClassId && !hasHighlightedMethod(sourceLifeline.matchedClassId)) { // UNhighlight triedy v CD ak nema ziadnu vysvietenu metodu
+				unhighlight(sourceLifeline.matchedClassId);
+				if (sourceLifeline.matchedClassId && sourceLifeline.id) { 	// zmaze zltu sipku medzi triedou v CD a lifeline blokom v SqD
+					removeInterDiagramLink(sourceLifeline.matchedClassId, sourceLifeline.id);
 				}
 			}
 			if (highlighted.has(msg.id)) { 									// UNhighlight return sipky v SqD
 				unhighlight(msg.id);
 			}
-			const relation = findRelationBetweenClasses(targetParent.matchedClassId, sourceParent.matchedClassId);
+			const relation = findRelationBetweenClasses(targetLifeline.matchedClassId, sourceLifeline.matchedClassId);
 			if (relation && highlighted.has(relation.id)) {
 				unhighlight(relation.id);									// UNhighlight sipky medzi triedami v CD
 			}
@@ -731,47 +654,52 @@ Draw.loadPlugin(function(editorUi)
 		}
 
 		// Animate initial source lifeline block
-		if (initialLfParent.id && highlighted.has(initialLfParent.id)) {
-			unhighlight(initialLfParent.id);
+		if (initialLifeline.id && highlighted.has(initialLifeline.id)) {
+			unhighlight(initialLifeline.id);
 		}
-		if (initialLf && highlighted.has(initialLf)) {
-			unhighlight(initialLf);
+		if (initialActivationBar && highlighted.has(initialActivationBar)) {
+			unhighlight(initialActivationBar);
 		}
 
 		console.log("=== Animation Script ===\n" + animationScript);
 		return animationScript;
 
-		// Helper: Check if a class has any highlighted elements inside (excluding specified ids)
-		function isClassEmpty(classId) {
-			for (const msg of messages) {
-				const method = cdCells.find(c => c.getAttribute("id") === msg.matchedClassId);
-				if (method && method.getAttribute("parent") === classId && highlighted.has(method.getAttribute("id") )) {
-					return false;
+		// Helper: Check if a class has any highlighted elements inside
+		function hasHighlightedMethod(classId) {
+			const cdClass = cdClasses.filter(c => c.id === classId)[0];
+			for (const method of cdClass.children) {
+				if (highlighted.has(method)) {
+					return true;
 				}
 			}
-			return true;
+			return false;
+		}
+
+		// Helper: Check if a lifeline has any highlighted activation bars
+		function hasHighlightedActivationBar(lifelineId) {
+			const lifeline = lifelines.filter(l => l.id === lifelineId)[0];
+			for (const activationBar of lifeline.activationBars) {
+				if (highlighted.has(activationBar.id)) {
+					return true;
+				}
+			}
+			return false;
 		}
 
 		function findRelationBetweenClasses(sourceId, targetId) {
-			console.log("find arrow between classes s: ", sourceId, "t: ", targetId);
 			if (!sourceId || !targetId) {
 				return;
 			}
-
-			console.log(cdRelations);
 			return cdRelations.find(r => r.source === sourceId && r.target === targetId);
-
-			// TODO 
+			// TODO hladat ked tak aj opacne
 		}
 	}
 
 	editorUi.actions.addAction('generateCustomAnim', function() {
-		// Create a hidden file input element
 		const input = document.createElement('input');
 		input.type = 'file';
 		input.accept = '.json'; // Accept only JSON files
 
-		// When the user selects a file
 		input.addEventListener('change', function () {
 			const file = input.files[0];
 			if (!file) return;
@@ -800,7 +728,6 @@ Draw.loadPlugin(function(editorUi)
 			reader.readAsText(file); 
 		});
 
-		// Trigger the file picker
 		input.click();
 	});
 
