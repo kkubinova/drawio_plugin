@@ -194,7 +194,7 @@ Draw.loadPlugin(function(editorUi)
 									var target = mapping[tokens[2]];
 									if (source && target) {
 										graph.getModel().beginUpdate();
-										console.log("[customAnimation] Adding link between: ", source, target);
+										// console.log("[customAnimation] Adding link between: ", source, target);
 										try {
 											var parent = graph.getDefaultParent();
 											var edge = graph.insertEdge(
@@ -220,7 +220,7 @@ Draw.loadPlugin(function(editorUi)
 								}
 								// Handle 'remove id1 id2' command to remove a yellow arrow between diagrams
 								else if (tokens[0] === 'remove' && tokens.length > 2) {
-									console.log('[customAnimation] REMOVE command detected:', tokens);
+									// console.log('[customAnimation] REMOVE command detected:', tokens);
 									var source = mapping[tokens[1]];
 									var target = mapping[tokens[2]];
 									if (source && target) {
@@ -243,7 +243,7 @@ Draw.loadPlugin(function(editorUi)
 											graph.getModel().beginUpdate();
 											try {
 												graph.removeCells(edgesToRemove);
-												console.log('[customAnimation] Removed yellow edge(s):', edgesToRemove);
+												// console.log('[customAnimation] Removed yellow edge(s):', edgesToRemove);
 											} catch (e) {
 												console.error('[customAnimation] Error removing edge(s):', e);
 											} finally {
@@ -313,7 +313,7 @@ Draw.loadPlugin(function(editorUi)
 								}
 								else
 								{
-									console.log('cell not found', id, steps[step]);
+									console.warn('cell not found', id, steps[step]);
 								}
 							}
 							
@@ -491,7 +491,7 @@ Draw.loadPlugin(function(editorUi)
 				};
 				reader.readAsText(file);
 			} else {
-				console.log("No file selected or file input error.");
+				console.warn("No file selected or file input error.");
 			}
 		});
 		actionGroup.appendChild(uploadBtn);

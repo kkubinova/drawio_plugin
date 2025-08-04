@@ -34,121 +34,54 @@ Draw.loadPlugin(function(editorUi)
 		return { xmlDoc, sqdCells, cdCells };
 	}
 
+	// Extract lifelines from cells
+	function extractLifelines(cells) {			
+		return cells.filter(cell =>
+			cell.getAttribute("style") && cell.getAttribute("style").includes("shape=umlLifeline")
+		).map(cell => {
+			const rectangles = cells
+				.filter(c =>
+					c.getAttribute("vertex") === "1" &&
+					c.getAttribute("parent") === cell.getAttribute("id") &&
+					(!c.getAttribute("style") || !c.getAttribute("style").includes("shape=umlLifeline"))
+				)
+				.filter(c => {
+					const geoElem = c.getElementsByTagName("mxGeometry")[0];
+					if (!geoElem) return false;
+					const width = parseFloat(geoElem.getAttribute("width")) || 0;
+					const height = parseFloat(geoElem.getAttribute("height")) || 0;
+					return width > 0 && height > 0;
+				})
+				.map(c => {
+					const geoElem = c.getElementsByTagName("mxGeometry")[0];
+					const width = parseFloat(geoElem.getAttribute("width"));
+					const height = parseFloat(geoElem.getAttribute("height"));
+					const x = parseFloat(geoElem.getAttribute("x"));
+					const y = parseFloat(geoElem.getAttribute("y"));
+					return {
+						id: c.getAttribute("id"),
+						x,
+						y,
+						width,
+						height
+					};
+				});
+
+			return {
+				id: cell.getAttribute("id"),
+				label: cell.getAttribute("value"),
+				parent: cell.getAttribute("parent"),
+				rectangles: rectangles
+			};
+		});
+	}
+
 	function parseSequenceDiagram(sqdCells, cdCells, fileJson) {
-		// Extract alt/loop/opt elements and their children
-		// function extractFragments(cells) {
-		// 	const fragmentTypes = ['alt', 'loop', 'opt'];
-		// 	const fragments = [];
-
-		// 	// Helper: Get direct (local) x, y from mxGeometry
-		// 	function getLocalPosition(cell) {
-		// 		const geoElem = cell.getElementsByTagName("mxGeometry")[0];
-		// 		return {
-		// 			x: geoElem ? parseFloat(geoElem.getAttribute("x")) || 0 : 0,
-		// 			y: geoElem ? parseFloat(geoElem.getAttribute("y")) || 0 : 0
-		// 		};
-		// 	}
-	
-		// 	// Helper: recursively collect all descendants of a cell with position
-		// 	function collectChildren(parentId) {
-		// 		const children = [];
-		// 		cells.forEach(cell => {
-		// 			if (cell.getAttribute("parent") === parentId) {
-		// 				const pos = getLocalPosition(cell);
-		// 				children.push({
-		// 					id: cell.getAttribute("id"),
-		// 					value: cell.getAttribute("value"),
-		// 					x: pos.x,
-		// 					y: pos.y
-		// 				});
-		// 				const subchildren = collectChildren(cell.getAttribute("id"));
-		// 				children.push(...subchildren);
-		// 			}
-		// 		});
-		// 		return children;
-		// 	}
-	
-		// 	cells.forEach(cell => {
-		// 		const value = (cell.getAttribute("value") || "").toLowerCase();
-		// 		if (fragmentTypes.includes(value)) {
-		// 			const pos = getLocalPosition(cell);
-		// 			const fragment = {
-		// 				id: cell.getAttribute("id"),
-		// 				value: value,
-		// 				x: pos.x,
-		// 				y: pos.y,
-		// 				children: collectChildren(cell.getAttribute("id"))
-		// 			};
-		// 			fragments.push(fragment);
-		// 		}
-		// 	});
-		// 	return fragments;
-		// }
-		// const fragments = extractFragments(sqdCells);
-
 		const fragments = fileJson;
-
-		// Extract lifelines from cells
-		function extractLifelines(cells, getAbsolutePosition) {
-			// Helper: Compute absolute position for a cell by summing up parent geometries
-			function getAbsolutePosition(cell) {
-				let x = 0, y = 0;
-				let current = cell;
-				while (current) {
-					const geoElem = current.getElementsByTagName("mxGeometry")[0];
-					if (geoElem) {
-						x += parseFloat(geoElem.getAttribute("x")) || 0;
-						y += parseFloat(geoElem.getAttribute("y")) || 0;
-					}
-					const parentId = current.getAttribute("parent");
-					if (!parentId) break;
-					current = cells.find(c => c.getAttribute("id") === parentId);
-				}
-				return { x, y };
-			}
-
-			
-			return cells.filter(cell =>
-				cell.getAttribute("style") && cell.getAttribute("style").includes("shape=umlLifeline")
-			).map(cell => {
-				const rectangles = cells
-					.filter(c =>
-						c.getAttribute("vertex") === "1" &&
-						c.getAttribute("parent") === cell.getAttribute("id") &&
-						(!c.getAttribute("style") || !c.getAttribute("style").includes("shape=umlLifeline"))
-					)
-					.filter(c => {
-						const geoElem = c.getElementsByTagName("mxGeometry")[0];
-						if (!geoElem) return false;
-						const width = parseFloat(geoElem.getAttribute("width")) || 0;
-						const height = parseFloat(geoElem.getAttribute("height")) || 0;
-						return width > 0 && height > 0;
-					})
-					.map(c => {
-						const geoElem = c.getElementsByTagName("mxGeometry")[0];
-						const width = parseFloat(geoElem.getAttribute("width"));
-						const height = parseFloat(geoElem.getAttribute("height"));
-						const abs = getAbsolutePosition(c);
-						return {
-							id: c.getAttribute("id"),
-							x: abs.x,
-							y: abs.y,
-							width,
-							height
-						};
-					});
-
-				return {
-					id: cell.getAttribute("id"),
-					label: cell.getAttribute("value"),
-					parent: cell.getAttribute("parent"),
-					rectangles: rectangles
-				};
-			});
-		}
 
 		// Extract lifelines (umlLifeline in style) from sqdCells
 		var lifelines = extractLifelines(sqdCells);
+
 		// Match lifelines to classes by label 
 		lifelines.forEach(lf => {
 			const match = cdCells.find(cell => cell.getAttribute("value") && lf.label && lf.label.trim() === cell.getAttribute("value").trim());
@@ -172,10 +105,10 @@ Draw.loadPlugin(function(editorUi)
 			subFragment: ""
 		}));
 
+		// Add fragment reference to message/arrow
 		function isIdInFragmentLines(subFragment, targetId) {
 			return subFragment.lines?.some(line => line.id === targetId);
 		}
-
 		messages.forEach(msg => {
 			fragments.forEach(fragment => {
 				fragment.child_areas.forEach(subFragment => {
@@ -198,15 +131,6 @@ Draw.loadPlugin(function(editorUi)
 			}
 		});
 
-
-		// Helper: Check if point is inside a rectangle with optional padding // TODO delete, imo aj tak nefunguje cele toto s poziciami
-		function pointInRect(point, rect, padding = 20) {
-			return point.x >= rect.x - padding &&
-				point.x <= rect.x + rect.width + padding &&
-				point.y >= rect.y - padding &&
-				point.y <= rect.y + rect.height + padding;
-		}
-
 		// Helper: Compute absolute position for a point in a cell by summing up parent geometries
 		function getAbsolutePoint(cell, point) {
 			if (!point) return null;
@@ -226,21 +150,15 @@ Draw.loadPlugin(function(editorUi)
 			return { x: absX, y: absY };
 		}
 
+		// Add source and target lifeline block to message/arrow // TODO
 		messages.forEach(msg => {
 			const cell = sqdCells.find(c => c.getAttribute("id") === msg.id);
-			if (!cell) {
-				console.warn("[generateCustomAnim] parseDiagramXml: No cell found for message id", msg.id);
-				return;
-			}
-
 			const geometry = cell.getElementsByTagName("mxGeometry")[0];
-			if (!geometry) {
-				console.warn("[generateCustomAnim] parseDiagramXml: No geometry found for message id", msg.id);
-				return;
-			}
-
 			const mxPoints = geometry.getElementsByTagName("mxPoint");
-			let sourcePointElem = null, targetPointElem = null;
+
+			let sourcePointElem = null;
+			let targetPointElem = null;
+
 			for (let i = 0; i < mxPoints.length; i++) {
 				const asAttr = mxPoints[i].getAttribute("as");
 				if (asAttr === "sourcePoint") sourcePointElem = mxPoints[i];
@@ -274,107 +192,25 @@ Draw.loadPlugin(function(editorUi)
 			msg.sourcePoint = getAbsolutePoint(cell, sourcePoint);
 			msg.targetPoint = getAbsolutePoint(cell, targetPoint);
 
-			// Prefer Draw.io reference: if msg.source matches a rectangle's id, assign directly
+			// If msg.source matches a rectangle's id, assign directly 
 			if (!msg.source && msg.sourcePoint) {
-				let foundByReference = false;
 				for (const lf of lifelines) {
 					for (const rect of lf.rectangles) {
 						if (rect && msg.source && rect.id === msg.source) {
-							// Direct reference match
 							msg.source = rect.id;
-							foundByReference = true;
 							break;
 						}
-					}
-					if (foundByReference) break;
-				}
-				// Fallback: geometric proximity with generous padding
-				if (!foundByReference) {
-					console.log("not found by reference")
-					for (const lf of lifelines) {
-						for (const rect of lf.rectangles) {
-							const rectCell = sqdCells.find(c => c.getAttribute("id") === rect.id);
-							let absRect = rect;
-							console.log("if rectCell")
-							if (rectCell) {
-								let abs = { x: rect.x, y: rect.y };
-								let current = rectCell;
-								while (current) {
-									const geoElem = current.getElementsByTagName("mxGeometry")[0];
-									if (geoElem) {
-										abs.x += parseFloat(geoElem.getAttribute("x")) || 0;
-										abs.y += parseFloat(geoElem.getAttribute("y")) || 0;
-									}
-									const parentId = current.getAttribute("parent");
-									if (!parentId) break;
-									current = sqdCells.find(c => c.getAttribute("id") === parentId);
-								}
-								absRect = {
-									...rect,
-									x: abs.x,
-									y: abs.y
-								};
-								console.log("absRect")
-								console.log(absRect)
-								console.log("msg.sourcePoint")
-								console.log(msg.sourcePoint)
-							}
-							// Use a larger padding for fuzzy matching
-							if (rect && pointInRect(msg.sourcePoint, absRect, 40)) {
-								msg.source = rect.id;
-								break;
-							}
-						}
-						if (msg.source) break;
 					}
 				}
 			}
-			// Prefer Draw.io reference: if msg.target matches a rectangle's id, assign directly
+			// If msg.target matches a rectangle's id, assign directly
 			if (!msg.target && msg.targetPoint) {
-				let foundByReference = false;
 				for (const lf of lifelines) {
 					for (const rect of lf.rectangles) {
 						if (rect && msg.target && rect.id === msg.target) {
-							// Direct reference match
 							msg.target = rect.id;
-							foundByReference = true;
 							break;
 						}
-					}
-					if (foundByReference) break;
-				}
-				// Fallback: geometric proximity with generous padding
-				if (!foundByReference) {
-					for (const lf of lifelines) {
-						for (const rect of lf.rectangles) {
-							const rectCell = sqdCells.find(c => c.getAttribute("id") === rect.id);
-							let absRect = rect;
-							if (rectCell) {
-								let abs = { x: rect.x, y: rect.y };
-								let current = rectCell;
-								while (current) {
-									const geoElem = current.getElementsByTagName("mxGeometry")[0];
-									if (geoElem) {
-										abs.x += parseFloat(geoElem.getAttribute("x")) || 0;
-										abs.y += parseFloat(geoElem.getAttribute("y")) || 0;
-									}
-									const parentId = current.getAttribute("parent");
-									if (!parentId) break;
-									current = sqdCells.find(c => c.getAttribute("id") === parentId);
-								}
-								absRect = {
-									...rect,
-									x: abs.x,
-									y: abs.y
-								};
-							}
-							// Use a larger padding for fuzzy matching
-							if (rect && pointInRect(msg.targetPoint, absRect, 40)) {
-								msg.target = rect.id;
-								break;
-							}
-						}
-						if (msg.target) break;
 					}
 				}
 			}
@@ -531,8 +367,7 @@ Draw.loadPlugin(function(editorUi)
 			};
 		});
 
-		// For debugging, log class arrows with source and target classes
-		console.log("[generateCustomAnim] Class diagram arrows with source/target classes:\n", classArrows);
+		console.log("Class diagram arrows with source/target classes:\n", classArrows);
 		return classArrows;
 	}
 
@@ -625,13 +460,6 @@ Draw.loadPlugin(function(editorUi)
 		var visitedFragments = new Set();
 		var visitedSubFragments = new Set();
 
-		console.log(sortedMessages)
-		sortedMessages.forEach((msg, idx) => {
-			console.log(
-				`Step ${idx + 1}: [${msg.id}] "${msg.label}" from ${msg.source || "?"} to ${msg.target || "?"}`
-			);
-		});
-
 		sortedMessages.forEach(msg => {
 			if (!visited.has(msg.id)) {
 				if (msg.fragment !== "") { // TODO zatial iba pre alt, dat to do funkcii ptm aj pre loop (3x sa bude opakovat) a opt (? idk asi budeme ukazovat ze plati)
@@ -652,9 +480,9 @@ Draw.loadPlugin(function(editorUi)
 					}
 					else {
 						if (msg.fragment === fragments.peek()) {
-							console.log("msg.fragment === fragments.peek()")
+							// console.log("msg.fragment === fragments.peek()")
 							if (msg.subFragment === subFragments.peek()) {
-								console.log("msg.subFragment === subFragments.peek()")
+								// console.log("msg.subFragment === subFragments.peek()")
 								flow.push({
 									id: msg.id,
 									label: msg.label,
@@ -667,12 +495,12 @@ Draw.loadPlugin(function(editorUi)
 								visited.add(msg.id);
 							}
 							else {
-								console.log("NIE msg.subFragment === subFragments.peek(); nepridavam")
+								// console.log("NIE msg.subFragment === subFragments.peek(); nebude sa animovat")
 								visited.add(msg.id);
 							}
 						}
 						else if (msg.fragmentParent === subFragments.peek()) { // vnorene ?? idk ci je to dobre
-							console.log("vnorene");
+							// console.log("vnorene");
 							fragments.push(msg.fragment);
 							subFragments.push(msg.subFragment);
 							flow.push({
@@ -724,7 +552,7 @@ Draw.loadPlugin(function(editorUi)
 			}
 		});
 
-		console.log("Sequence Flow (ordered by connectivity):", flow);
+		console.log("Sequence Flow (ordered):", flow);
 		flow.forEach((msg, idx) => {
 			console.log(
 				`Step ${idx + 1}: [${msg.id}] "${msg.label}" from ${msg.source || "?"} to ${msg.target || "?"}`
@@ -961,13 +789,13 @@ Draw.loadPlugin(function(editorUi)
 				const animation = generateAnimation(fileJson);
 
 				// Save as a text file (one label per line)
-				// const blob = new Blob([animation], { type: 'text/plain' });
-				// const a = document.createElement('a');
-				// a.href = URL.createObjectURL(blob);
-				// a.download = 'animation.txt';
-				// document.body.appendChild(a);
-				// a.click();
-				// document.body.removeChild(a);
+				const blob = new Blob([animation], { type: 'text/plain' });
+				const a = document.createElement('a');
+				a.href = URL.createObjectURL(blob);
+				a.download = 'animation.txt';
+				document.body.appendChild(a);
+				a.click();
+				document.body.removeChild(a);
 			};
 			reader.readAsText(file); 
 		});
