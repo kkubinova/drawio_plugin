@@ -1,0 +1,82 @@
+[
+    {
+        "id": "_0e_HGupx2ryaP7_1tBM-33",
+        "value": "alt",
+        "y": 857.35,
+        "height": "312.65",
+        "child_areas": [
+            {
+                "id": "_0e_HGupx2ryaP7_1tBM-34",
+                "value": "[Eligible]",
+                "y": 857.35,
+                "lines": [
+                    {
+                        "id": "_0e_HGupx2ryaP7_1tBM-31",
+                        "value": "allowed",
+                        "y": 930.1826484018266
+                    },
+                    {
+                        "id": "_0e_HGupx2ryaP7_1tBM-39",
+                        "value": "allowed",
+                        "y": 963.2876712328767
+                    }
+                ],
+                "height": 164.72956989247314
+            },
+            {
+                "id": "_0e_HGupx2ryaP7_1tBM-35",
+                "value": "\u00a0 \u00a0 \u00a0 \u00a0 \u00a0 \u00a0 \u00a0 \u00a0 \u00a0 \u00a0 \u00a0[Not eligible]",
+                "y": 1022.0795698924732,
+                "lines": [
+                    {
+                        "id": "_0e_HGupx2ryaP7_1tBM-32",
+                        "value": "not allowed",
+                        "y": 1046.7123287671234
+                    },
+                    {
+                        "id": "_0e_HGupx2ryaP7_1tBM-40",
+                        "value": "not allowed",
+                        "y": 1077.1689497716895
+                    }
+                ],
+                "height": 147.92043010752684
+            }
+        ],
+        "parent": null
+    },
+    {
+        "id": "WOWcQtLG_PKahAr-IslZ-1",
+        "value": "alt",
+        "y": 890.0,
+        "height": "30",
+        "child_areas": [
+            {
+                "id": "WOWcQtLG_PKahAr-IslZ-2",
+                "value": "[Big]",
+                "y": 890.0,
+                "lines": [
+                    {
+                        "id": "WOWcQtLG_PKahAr-IslZ-14",
+                        "value": "biggus",
+                        "y": 900.37
+                    }
+                ],
+                "height": 15.806451612903174
+            },
+            {
+                "id": "WOWcQtLG_PKahAr-IslZ-3",
+                "value": "[Small]",
+                "y": 905.8064516129032,
+                "lines": [
+                    {
+                        "id": "WOWcQtLG_PKahAr-IslZ-15",
+                        "value": "smallus",
+                        "y": 910.0
+                    }
+                ],
+                "height": 14.193548387096826
+            }
+        ],
+        "parent": "_0e_HGupx2ryaP7_1tBM-34"
+    }
+]

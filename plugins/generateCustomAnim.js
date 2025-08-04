@@ -6,15 +6,14 @@ Draw.loadPlugin(function(editorUi)
 	// Adds resource for action
 	mxResources.parse('generateCustomAnim=Generate Custom Animation...');
 
-	function generateAnimation() {
+	function generateAnimation(fileJson) {
 		const { xmlDoc, sqdCells, cdCells } = parseDiagramXml(editorUi);
 		
-		const [lifelines, sqdMessages, fragments] = parseSequenceDiagram(sqdCells, cdCells);
+		console.log("fileJson: \n", fileJson);
+
+		const [lifelines, sqdMessages, fragments] = parseSequenceDiagram(sqdCells, cdCells, fileJson);
 		const cdRelations = parseClassDiagram(sqdCells, cdCells);
 
-		// For now, just log the fragments. You can use them as needed downstream.
-		console.log("[generateCustomAnim] Sequence fragments:", fragments);
-		
 		var animationScript = buildAnimationScript(lifelines, sqdMessages, cdRelations, cdCells);
 	
 		return animationScript;
@@ -25,7 +24,7 @@ Draw.loadPlugin(function(editorUi)
 		var parser = new DOMParser();
 		var xmlDoc = parser.parseFromString(xml, "text/xml");
 	       
-		console.log("[generateCustomAnim] parseDiagramXml: parsed XML document\n", xml);
+		console.log("parseDiagramXml: parsed XML document\n", xml);
 
 		var cells = Array.from(xmlDoc.getElementsByTagName("mxCell"));
 
@@ -35,39 +34,59 @@ Draw.loadPlugin(function(editorUi)
 		return { xmlDoc, sqdCells, cdCells };
 	}
 
-	function parseSequenceDiagram(sqdCells, cdCells) {
+	function parseSequenceDiagram(sqdCells, cdCells, fileJson) {
 		// Extract alt/loop/opt elements and their children
-		function extractFragments(cells) {
-			const fragmentTypes = ['alt', 'loop', 'opt'];
-			const fragments = [];
+		// function extractFragments(cells) {
+		// 	const fragmentTypes = ['alt', 'loop', 'opt'];
+		// 	const fragments = [];
 
-			// Helper: recursively collect all descendants of a cell
-			function collectChildren(parentId) {
-				const children = [];
-				cells.forEach(cell => {
-					if (cell.getAttribute("parent") === parentId) {
-						children.push(cell);
-						children.push(...collectChildren(cell.getAttribute("id")));
-					}
-				});
-				return children;
-			}
+		// 	// Helper: Get direct (local) x, y from mxGeometry
+		// 	function getLocalPosition(cell) {
+		// 		const geoElem = cell.getElementsByTagName("mxGeometry")[0];
+		// 		return {
+		// 			x: geoElem ? parseFloat(geoElem.getAttribute("x")) || 0 : 0,
+		// 			y: geoElem ? parseFloat(geoElem.getAttribute("y")) || 0 : 0
+		// 		};
+		// 	}
+	
+		// 	// Helper: recursively collect all descendants of a cell with position
+		// 	function collectChildren(parentId) {
+		// 		const children = [];
+		// 		cells.forEach(cell => {
+		// 			if (cell.getAttribute("parent") === parentId) {
+		// 				const pos = getLocalPosition(cell);
+		// 				children.push({
+		// 					id: cell.getAttribute("id"),
+		// 					value: cell.getAttribute("value"),
+		// 					x: pos.x,
+		// 					y: pos.y
+		// 				});
+		// 				const subchildren = collectChildren(cell.getAttribute("id"));
+		// 				children.push(...subchildren);
+		// 			}
+		// 		});
+		// 		return children;
+		// 	}
+	
+		// 	cells.forEach(cell => {
+		// 		const value = (cell.getAttribute("value") || "").toLowerCase();
+		// 		if (fragmentTypes.includes(value)) {
+		// 			const pos = getLocalPosition(cell);
+		// 			const fragment = {
+		// 				id: cell.getAttribute("id"),
+		// 				value: value,
+		// 				x: pos.x,
+		// 				y: pos.y,
+		// 				children: collectChildren(cell.getAttribute("id"))
+		// 			};
+		// 			fragments.push(fragment);
+		// 		}
+		// 	});
+		// 	return fragments;
+		// }
+		// const fragments = extractFragments(sqdCells);
 
-			cells.forEach(cell => {
-				const value = (cell.getAttribute("value") || "").toLowerCase();
-				if (fragmentTypes.includes(value)) {
-					const fragment = {
-						id: cell.getAttribute("id"),
-						value: value,
-						children: collectChildren(cell.getAttribute("id"))
-					};
-					fragments.push(fragment);
-				}
-			});
-			return fragments;
-		}
-
-		const fragments = extractFragments(sqdCells);
+		const fragments = fileJson;
 
 		// Extract lifelines from cells
 		function extractLifelines(cells, getAbsolutePosition) {
@@ -147,8 +166,27 @@ Draw.loadPlugin(function(editorUi)
 			parent: cell.getAttribute("parent"),
 			source: cell.getAttribute("source"),
 			target: cell.getAttribute("target"),
-			dashed: cell.getAttribute("style").includes("dashed=1")
+			dashed: cell.getAttribute("style").includes("dashed=1"),
+			fragment: "",
+			fragmentParent: "",
+			subFragment: ""
 		}));
+
+		function isIdInFragmentLines(subFragment, targetId) {
+			return subFragment.lines?.some(line => line.id === targetId);
+		}
+
+		messages.forEach(msg => {
+			fragments.forEach(fragment => {
+				fragment.child_areas.forEach(subFragment => {
+					if (isIdInFragmentLines(subFragment, msg.id)) {
+						msg.subFragment = subFragment.id;
+						msg.fragment = fragment.id;
+						msg.fragmentParent = fragment.parent;
+					}
+				})
+			})
+		})
 
 		// Match messages to methods in matched class
 		messages.forEach(msg => {
@@ -161,7 +199,7 @@ Draw.loadPlugin(function(editorUi)
 		});
 
 
-		// Helper: Check if point is inside a rectangle with optional padding
+		// Helper: Check if point is inside a rectangle with optional padding // TODO delete, imo aj tak nefunguje cele toto s poziciami
 		function pointInRect(point, rect, padding = 20) {
 			return point.x >= rect.x - padding &&
 				point.x <= rect.x + rect.width + padding &&
@@ -364,8 +402,7 @@ Draw.loadPlugin(function(editorUi)
 
 		console.log("Lifelines:", lifelines);
 		console.log("Messages/Arrows:", messages);
-
-		console.log("[generateCustomAnim] Fragments (alt/loop/opt):", fragments);
+		console.log("Fragments (alt/loop/opt):", fragments);
 
 		return [lifelines, messages, fragments];
 	}
@@ -573,24 +610,117 @@ Draw.loadPlugin(function(editorUi)
 		console.log("Returns", returns);
 
 		// Traverse the flow in global vertical order, including backward arrows
-		var flow = [];
+		var flow = []; 
 		var visited = new Set();
 
 		// Collect all messages with valid sourcePoint, sort by sourcePoint.y (top to bottom)
 		var sortedMessages = messages
 			.filter(msg => msg.sourcePoint)
-			.sort((a, b) => a.sourcePoint.y - b.sourcePoint.y);
+			.sort((a, b) => {
+				return a.sourcePoint.x - b.sourcePoint.x && a.sourcePoint.y - b.sourcePoint.y
+			});
+
+		var fragments = new Stack();
+		var subFragments = new Stack();
+		var visitedFragments = new Set();
+		var visitedSubFragments = new Set();
+
+		console.log(sortedMessages)
+		sortedMessages.forEach((msg, idx) => {
+			console.log(
+				`Step ${idx + 1}: [${msg.id}] "${msg.label}" from ${msg.source || "?"} to ${msg.target || "?"}`
+			);
+		});
 
 		sortedMessages.forEach(msg => {
 			if (!visited.has(msg.id)) {
-				flow.push({
-					id: msg.id,
-					label: msg.label,
-					matchedClassId: msg.matchedClassId,
-					source: msg.source,
-					target: msg.target
-				});
-				visited.add(msg.id);
+				if (msg.fragment !== "") { // TODO zatial iba pre alt, dat to do funkcii ptm aj pre loop (3x sa bude opakovat) a opt (? idk asi budeme ukazovat ze plati)
+					if (fragments.length === 0 && subFragments.length === 0) {
+						console.log("prazdne stacky")
+						fragments.push(msg.fragment);
+						subFragments.push(msg.subFragment);
+						flow.push({
+							id: msg.id,
+							label: msg.label,
+							matchedClassId: msg.matchedClassId,
+							source: msg.source,
+							target: msg.target,
+							fragment: msg.fragment,
+							subFragment: msg.subFragment,
+						});
+						visited.add(msg.id);
+					}
+					else {
+						if (msg.fragment === fragments.peek()) {
+							console.log("msg.fragment === fragments.peek()")
+							if (msg.subFragment === subFragments.peek()) {
+								console.log("msg.subFragment === subFragments.peek()")
+								flow.push({
+									id: msg.id,
+									label: msg.label,
+									matchedClassId: msg.matchedClassId,
+									source: msg.source,
+									target: msg.target,
+									fragment: msg.fragment,
+									subFragment: msg.subFragment,
+								});
+								visited.add(msg.id);
+							}
+							else {
+								console.log("NIE msg.subFragment === subFragments.peek(); nepridavam")
+								visited.add(msg.id);
+							}
+						}
+						else if (msg.fragmentParent === subFragments.peek()) { // vnorene ?? idk ci je to dobre
+							console.log("vnorene");
+							fragments.push(msg.fragment);
+							subFragments.push(msg.subFragment);
+							flow.push({
+								id: msg.id,
+								label: msg.label,
+								matchedClassId: msg.matchedClassId,
+								source: msg.source,
+								target: msg.target,
+								fragment: msg.fragment,
+								subFragment: msg.subFragment,
+							});
+							visited.add(msg.id);
+						}
+						else {
+							visitedFragments.add(fragments.pop());
+							visitedSubFragments.add(subFragments.pop());
+							fragments.push(msg.fragment);
+							subFragments.push(msg.subFragment);
+							flow.push({
+								id: msg.id,
+								label: msg.label,
+								matchedClassId: msg.matchedClassId,
+								source: msg.source,
+								target: msg.target,
+								fragment: msg.fragment,
+								subFragment: msg.subFragment,
+							});
+							visited.add(msg.id);
+						}
+					}
+				}
+				else {
+					while (fragments.length > 0) {
+						visitedFragments.add(fragments.pop());
+						visitedSubFragments.add(subFragments.pop());
+					}
+					flow.push({
+						id: msg.id,
+						label: msg.label,
+						matchedClassId: msg.matchedClassId,
+						source: msg.source,
+						target: msg.target,
+						fragment: msg.fragment,
+						subFragment: msg.subFragment,
+					});
+					visited.add(msg.id);
+				}
+				
 			}
 		});
 
@@ -671,16 +801,30 @@ Draw.loadPlugin(function(editorUi)
 		}
 		wait();
 
+		var frag = [];
+
 		flow.forEach((msg) => {
 			const sourceParent = findLifelineByRectId(msg.source);
 			const targetParent = findLifelineByRectId(msg.target);
 
+			if (msg.fragment !== "") { // todo ani toto neviem ci je ok
+				frag.push(msg.fragment);
+				animateFragment(msg.fragment);
+			}
 			if (calls.some(call => call.id === msg.id)) {
 				animateCallStep(msg, sourceParent, targetParent);
 			} else if (returns.some(ret => ret.id === msg.id)) {
-				animateReturnStep(msg, sourceParent, targetParent);
+				animateReturnStep(msg, sourceParent, targetParent, frag);
 			}
 		});
+
+		// Animate a fragment
+		function animateFragment(fragment) {
+			if (!highlighted.has(fragment)) {
+				highlightCell(fragment);
+			}
+			wait();			
+		}
 
 		// Animate a call step
 		function animateCallStep(msg, sourceParent, targetParent) {
@@ -717,12 +861,15 @@ Draw.loadPlugin(function(editorUi)
 		}
 
 		// Animate a return step
-		function animateReturnStep(msg, sourceParent, targetParent) {
+		function animateReturnStep(msg, sourceParent, targetParent, frag) {
 			const matchingCall = findMatchingCall(msg);
 			if (!highlighted.has(msg.id)) { 								// highlight return sipky v SqD
 				highlightArrow(msg.id);
 			}
 			wait();
+			if (msg.fragment !== "") {
+				frag.pop();
+			}
 			if (matchingCall.matchedClassId && highlighted.has(matchingCall.matchedClassId)) { // UNhighlight metody v CD
 				unhighlight(matchingCall.matchedClassId);
 			}
@@ -791,16 +938,42 @@ Draw.loadPlugin(function(editorUi)
 	}
 
 	editorUi.actions.addAction('generateCustomAnim', function() {
-		var animation = generateAnimation();
+		// Create a hidden file input element
+		const input = document.createElement('input');
+		input.type = 'file';
+		input.accept = '.json'; // Accept only JSON files
 
-        // Save as a text file (one label per line)
-		var blob = new Blob([animation], {type: 'text/plain'});
-		var a = document.createElement('a');
-		a.href = URL.createObjectURL(blob);
-		a.download = 'animation.txt';
-		document.body.appendChild(a);
-		a.click();
-		document.body.removeChild(a);
+		// When the user selects a file
+		input.addEventListener('change', function () {
+			const file = input.files[0];
+			if (!file) return;
+
+			const reader = new FileReader();
+
+			reader.onload = function (e) {
+				var fileJson;
+				try {
+					fileJson = JSON.parse(e.target.result); 
+				} catch (err) {
+					alert('Invalid JSON file.');
+					console.error(err);
+				}
+				const animation = generateAnimation(fileJson);
+
+				// Save as a text file (one label per line)
+				// const blob = new Blob([animation], { type: 'text/plain' });
+				// const a = document.createElement('a');
+				// a.href = URL.createObjectURL(blob);
+				// a.download = 'animation.txt';
+				// document.body.appendChild(a);
+				// a.click();
+				// document.body.removeChild(a);
+			};
+			reader.readAsText(file); 
+		});
+
+		// Trigger the file picker
+		input.click();
 	});
 
 	var menu = editorUi.menus.get('extras');
@@ -811,3 +984,22 @@ Draw.loadPlugin(function(editorUi)
 		editorUi.menus.addMenuItems(menu, ['-', '', 'generateCustomAnim'], parent);
 	};
 });
+
+
+class Stack {
+  constructor() {
+    this.items = [];
+  }
+
+  push(item) {
+    this.items.push(item);
+  }
+
+  pop() {
+    return this.items.pop();
+  }
+
+  peek() {
+    return this.items[this.items.length - 1];
+  }
+}

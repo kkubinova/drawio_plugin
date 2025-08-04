@@ -1,0 +1,47 @@
+[
+    {
+        "id": "_0e_HGupx2ryaP7_1tBM-33",
+        "value": "alt",
+        "y": 787.0,
+        "height": "186",
+        "child_areas": [
+            {
+                "id": "_0e_HGupx2ryaP7_1tBM-34",
+                "value": "[Eligible]",
+                "y": 787.0,
+                "lines": [
+                    {
+                        "id": "_0e_HGupx2ryaP7_1tBM-31",
+                        "value": "allowed",
+                        "y": 842.0
+                    },
+                    {
+                        "id": "_0e_HGupx2ryaP7_1tBM-39",
+                        "value": "allowed",
+                        "y": 867.0
+                    }
+                ],
+                "height": 98.0
+            },
+            {
+                "id": "_0e_HGupx2ryaP7_1tBM-35",
+                "value": "\u00a0 \u00a0 \u00a0 \u00a0 \u00a0 \u00a0 \u00a0 \u00a0 \u00a0 \u00a0 \u00a0[Not eligible]",
+                "y": 885.0,
+                "lines": [
+                    {
+                        "id": "_0e_HGupx2ryaP7_1tBM-32",
+                        "value": "not allowed",
+                        "y": 930.0
+                    },
+                    {
+                        "id": "_0e_HGupx2ryaP7_1tBM-40",
+                        "value": "not allowed",
+                        "y": 953.0
+                    }
+                ],
+                "height": 88.0
+            }
+        ],
+        "parent": null
+    }
+]
