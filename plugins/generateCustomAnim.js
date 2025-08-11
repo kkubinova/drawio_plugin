@@ -34,8 +34,11 @@ Draw.loadPlugin(function(editorUi)
 		allCells = allCells.map(cell => {
 			return {
 				id: cell.getAttribute("id"),
+				raw: cell,
 				label: cell.getAttribute("value"),
 				parent: cell.getAttribute("parent"),
+				is_edge: cell.getAttribute('edge') == '1',
+				is_vertex: cell.getAttribute('vertex') == '1',
 				geometry: cell.getElementsByTagName("mxGeometry")[0],
 			};
 		});
@@ -43,16 +46,73 @@ Draw.loadPlugin(function(editorUi)
 		return { xmlDoc, sqdCells, cdCells, allCells };
 	}
 
+	function getClosestLifeline(activationBar, lifelines, allCells) {
+		let abCoordinates = {
+			'id': activationBar.id,
+			'x': activationBar.geometry.getAttribute('x'),
+			'y': activationBar.geometry.getAttribute('y'),
+			'width': parseFloat(activationBar.geometry.getAttribute('width')),
+			'height': parseFloat(activationBar.geometry.getAttribute('height'))
+		};
+
+		let abAbsoluteCoordinates = getAbsolutePosition(activationBar, allCells);
+		abCoordinates.x = abAbsoluteCoordinates.x;
+		abCoordinates.y = abAbsoluteCoordinates.y;
+
+		let abMiddlePoint = {
+			'x': abCoordinates.x + abCoordinates.width/2,
+			'y': abCoordinates.y + abCoordinates.height/2
+		};
+
+		let lifelinesCoordinates = lifelines.map(lf => {
+			let lfCoordinates = {
+				'id': lf.id,
+				'x': lf.geometry.getAttribute('x'),
+				'y': lf.geometry.getAttribute('y'),
+				'width': parseFloat(lf.geometry.getAttribute('width')),
+				'height': parseFloat(lf.geometry.getAttribute('height'))
+			};
+
+			let lfAbsoluteCoordinates = getAbsolutePosition(lf, allCells);
+			lfCoordinates.x = lfAbsoluteCoordinates.x;
+			lfCoordinates.y = lfAbsoluteCoordinates.y;
+
+			return lfCoordinates;
+		});
+
+		lifelinesCoordinates.sort((a,b) => {
+			let aDist = distanceOfLinePointAndActivationBar(abMiddlePoint, a);
+			let bDist = distanceOfLinePointAndActivationBar(abMiddlePoint, b);
+
+			if (aDist < bDist) { return -1; }
+			else if (aDist > bDist) { return 1; }
+
+			return 0;
+		});
+
+		return lifelinesCoordinates[0];
+	}
+
 	// Helper to extract lifeline with its activation bars
-	function extractLifelines(cells) {			
-		return cells.filter(cell =>
+	function extractLifelines(sqdCells, allCells) {			
+		var lifelines = sqdCells.filter(cell =>
 			cell.getAttribute("style") && cell.getAttribute("style").includes("shape=umlLifeline")
 		).map(cell => {
-			const activationBars = cells
+			return {
+				id: cell.getAttribute("id"),
+				label: cell.getAttribute("value"),
+				parent: cell.getAttribute("parent"),
+				geometry: cell.getElementsByTagName("mxGeometry")[0],
+				activationBars: []
+			};
+		});
+
+		const activationBars
+			= allCells
+				.map(c => c.raw)
 				.filter(c =>
-					c.getAttribute("vertex") === "1" &&
-					c.getAttribute("parent") === cell.getAttribute("id") &&
-					(!c.getAttribute("style") || !c.getAttribute("style").includes("shape=umlLifeline"))
+					c.getAttribute("vertex") === "1" 
+					&& c.getAttribute("style").includes("targetShapes=umlLifeline")
 				)
 				.filter(c => {
 					const geoElem = c.getElementsByTagName("mxGeometry")[0];
@@ -74,17 +134,20 @@ Draw.loadPlugin(function(editorUi)
 						y: y,
 						width: width,
 						height: height,
-						geometry: geoElem
+						geometry: geoElem,
+						lifeline: null
 					};
 				});
 
-			return {
-				id: cell.getAttribute("id"),
-				label: cell.getAttribute("value"),
-				parent: cell.getAttribute("parent"),
-				activationBars: activationBars
-			};
-		});
+			activationBars.forEach(ab => {
+				ab.lifeline = getClosestLifeline(ab, lifelines, allCells).id;
+			});
+
+			lifelines.forEach(lf => {
+				lf.activationBars = activationBars.filter(ab => ab.lifeline == lf.id)
+			});
+
+		return lifelines;
 	}
 
 	// Helper to get absolute position of a cell by summing up parent geometries
@@ -108,7 +171,7 @@ Draw.loadPlugin(function(editorUi)
 	function getAbsolutePositionOfLine(cell, coordinates, diagramCells) {
 		let absolutePosition = { 'x': parseFloat(coordinates['x']), 'y': parseFloat(coordinates['y']) };
 		
-		let parent_id = cell.getAttribute('parent');
+		let parent_id = cell.parent || cell.getAttribute('parent');
 		let parent =  diagramCells.find(c => c.id === parent_id);
 		if (parent) {
 			let parentAbsolutePosition = getAbsolutePosition(parent, diagramCells);
@@ -173,12 +236,89 @@ Draw.loadPlugin(function(editorUi)
 		let result = { 'x': coordinateCell.getAttribute('x'), 'y': coordinateCell.getAttribute('y') };
 		return result;
 	}
+	
+	const fragTypes = ['alt', 'opt', 'loop', 'par'];
+	function extractFragmentsAndLinesHierarchy(allCells) {
+		let fragCells = allCells.filter(cell => fragTypes.includes(cell.label));
+		let fragments = fragCells.map(cell => {
+			let absPos = getAbsolutePosition(cell, allCells);
+			let fragment = {
+				'id': cell.id,
+				'value': cell.label,
+				'y': absPos['y'],
+				'height': cell.geometry.getAttribute('height'),
+				'child_areas': allCells.filter(ca => ca.parent == cell.id).map(ca => {
+					let childAreaMetadata = {
+						'id': ca.id,
+						'value': ca.label,
+						'y': getAbsolutePosition(ca, allCells)['y'],
+						'height': ca.geometry.getAttribute('height'),
+						'lines': []
+					};
+					return childAreaMetadata;
+				}),
+				'parent': cell.parent
+			};
+			return fragment;
+		});
+
+		let allChildAreaIds = fragments.map(frag => frag['child_areas']).reduce((acc, v) => acc.concat(v), []).map(ca => ca['id']);
+		fragments.forEach(frag => {
+			frag['parent'] = allChildAreaIds.includes(frag['parent']) ? frag['parent'] : null;
+		});
+
+		fragments.sort((a,b) => {
+			if (a.y < b.y) {
+				return -1;
+			} else if (a > b) {
+				return 1;
+			}
+			// a must be equal to b
+			return 0;
+		});
+
+		let lineCells = allCells.filter(line => line.is_edge).map(line => {
+			return {
+				'id': line.id,
+				'value': line.label,
+				'y': getAbsolutePositionOfLine(line, 'targetPoint', allCells)
+			};
+		});
+		lineCells.sort((a,b) => {
+			if (a.y < b.y) {
+				return -1;
+			} else if (a > b) {
+				return 1;
+			}
+			// a must be equal to b
+			return 0;
+		});
+
+		var found = false;
+		lineCells.forEach(line => {
+			for(let i = fragments.length - 1; i >= 0; i--) {
+				fragments[i]['child_areas'].forEach(ca => {
+					if(line['y'] >= ca['y'] && line['y'] <= (ca['y'] + ca['height'])) {
+						ca['lines'].append(line);
+						found = true;
+						return;
+					}
+				});
+
+				if (found) {
+					break;
+				}
+			}
+		});
+
+		return fragments;
+	}
 
 	function parseSequenceDiagram(sqdCells, cdCells, allCells, fileJson) {
-		const fragments = fileJson;
+		const fragments = extractFragmentsAndLinesHierarchy(allCells);
 
 		// Extract lifelines from sqdCells
-		var lifelines = extractLifelines(sqdCells);
+		var lifelines = extractLifelines(sqdCells, allCells);
 
 		// Match lifelines to classes by label 
 		lifelines.forEach(lf => {
