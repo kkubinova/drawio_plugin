@@ -7,11 +7,11 @@ Draw.loadPlugin(function(editorUi)
 	mxResources.parse('generateCustomAnim=Generate Custom Animation...');
 
 	function generateAnimation(fileJson) {
-		const { xmlDoc, sqdCells, cdCells } = parseDiagramXml(editorUi);
+		const { xmlDoc, sqdCells, cdCells, allCells } = parseDiagramXml(editorUi);
 		
 		console.log("fileJson: \n", fileJson);
 
-		const [lifelines, sqdMessages, fragments] = parseSequenceDiagram(sqdCells, cdCells, fileJson);
+		const [lifelines, sqdMessages, fragments] = parseSequenceDiagram(sqdCells, cdCells, allCells, fileJson);
 		const [cdClasses, cdRelations] = parseClassDiagram(sqdCells, cdCells);
 
 		var animationScript = buildAnimationScript(lifelines, sqdMessages, cdClasses, cdRelations, cdCells);
@@ -26,12 +26,21 @@ Draw.loadPlugin(function(editorUi)
 	       
 		console.log("parseDiagramXml: parsed XML document\n", xml);
 
-		var cells = Array.from(xmlDoc.getElementsByTagName("mxCell"));
+		var allCells = Array.from(xmlDoc.getElementsByTagName("mxCell"));
 
-		const sqdCells = getDiagramCells(cells, "SqD")   // SqD - name of layer for sequence diagram
-		const cdCells  = getDiagramCells(cells, "CD");   //  CD - name of layer for class diagram
+		const sqdCells = getDiagramCells(allCells, "SqD")   // SqD - name of layer for sequence diagram
+		const cdCells  = getDiagramCells(allCells, "CD");   //  CD - name of layer for class diagram
 
-		return { xmlDoc, sqdCells, cdCells };
+		allCells = allCells.map(cell => {
+			return {
+				id: cell.getAttribute("id"),
+				label: cell.getAttribute("value"),
+				parent: cell.getAttribute("parent"),
+				geometry: cell.getElementsByTagName("mxGeometry")[0],
+			};
+		});
+
+		return { xmlDoc, sqdCells, cdCells, allCells };
 	}
 
 	// Helper to extract lifeline with its activation bars
@@ -60,10 +69,12 @@ Draw.loadPlugin(function(editorUi)
 					const height = parseFloat(geoElem.getAttribute("height"));
 					return {
 						id: c.getAttribute("id"),
+						parent: c.getAttribute("parent"),
 						x: x,
 						y: y,
-						widht: width,
-						height: height
+						width: width,
+						height: height,
+						geometry: geoElem
 					};
 				});
 
@@ -76,7 +87,94 @@ Draw.loadPlugin(function(editorUi)
 		});
 	}
 
-	function parseSequenceDiagram(sqdCells, cdCells, fileJson) {
+	// Helper to get absolute position of a cell by summing up parent geometries
+	function getAbsolutePosition(cell, diagramCells) {
+		let x = 0, y = 0;
+		let current = cell;
+		while (current) {
+			const geoElem = current.geometry;
+			if (geoElem) {
+				x += parseFloat(geoElem.getAttribute("x")) || 0;
+				y += parseFloat(geoElem.getAttribute("y")) || 0;
+			}
+			const parentId = current.parent;
+			if (!parentId || parentId == '0') break;
+			current = diagramCells.find(c => c.id === parentId);
+		}
+
+		return { x, y };
+	}
+
+	function getAbsolutePositionOfLine(cell, coordinates, diagramCells) {
+		let absolutePosition = { 'x': parseFloat(coordinates['x']), 'y': parseFloat(coordinates['y']) };
+		
+		let parent_id = cell.getAttribute('parent');
+		let parent =  diagramCells.find(c => c.id === parent_id);
+		if (parent) {
+			let parentAbsolutePosition = getAbsolutePosition(parent, diagramCells);
+			absolutePosition['x'] = absolutePosition['x'] + parentAbsolutePosition['x'];
+			absolutePosition['y'] = absolutePosition['y'] + parentAbsolutePosition['y'];
+		}
+
+		return absolutePosition;
+	}
+
+
+	// Hinted by GPT - How do I calculate distance of a single point to the closest point of a rectangle?
+	function clamp(val, min, max) {
+		return Math.max(min, Math.min(max, val));
+	}
+
+	// Hinted by GPT - How do I calculate distance of a single point to the closest point of a rectangle?
+	function distanceOfLinePointAndActivationBar(linePointPosition, activationBarPosition){
+		let closestX = clamp(linePointPosition['x'], activationBarPosition['x'], activationBarPosition['x'] + activationBarPosition['width']);
+		let closestY = clamp(linePointPosition['y'], activationBarPosition['y'], activationBarPosition['y'] + activationBarPosition['height']);
+		let dx = linePointPosition['x'] - closestX;
+		let dy = linePointPosition['y'] - closestY;
+		let distance = Math.sqrt(dx * dx + dy * dy);
+		return distance;
+	}
+
+	function estimateClosestActivationBar(cell, lifelines, coordinateName, diagramCells) {
+		let closestActivationBar = null;
+		let absPositionOfCell = getAbsolutePositionOfLine(cell, getLineCoordinates(cell, coordinateName), diagramCells);
+
+		lifelines.forEach((lf) => {
+			lf.activationBars.forEach((ab) => {
+				if (!closestActivationBar) {
+					closestActivationBar = ab;
+				}
+				else {
+					let currentAbAbsolutePosition = getAbsolutePosition(ab, diagramCells);
+					currentAbAbsolutePosition['height'] = ab['height'];
+					currentAbAbsolutePosition['width'] = ab['width'];
+
+					let bestAbAbsolutePosition = getAbsolutePosition(closestActivationBar, diagramCells);
+					bestAbAbsolutePosition['height'] = closestActivationBar['height'];
+					bestAbAbsolutePosition['width'] = closestActivationBar['width'];
+
+					let distanceToCurrentActivationBar = distanceOfLinePointAndActivationBar(absPositionOfCell, currentAbAbsolutePosition);
+					let distanceToBestActivationBar = distanceOfLinePointAndActivationBar(absPositionOfCell, bestAbAbsolutePosition);
+
+					if (distanceToCurrentActivationBar < distanceToBestActivationBar) {
+						closestActivationBar = ab;
+					}
+				}
+			})
+		})
+
+		return closestActivationBar;
+	}
+
+	function getLineCoordinates(cell, coordinateName) {
+		let a = cell.getElementsByTagName('mxGeometry')[0];
+		let b = a.getElementsByTagName('mxPoint');
+		let coordinateCell = Array.from(b).filter(el => el.getAttribute("as") == coordinateName)[0];
+		let result = { 'x': coordinateCell.getAttribute('x'), 'y': coordinateCell.getAttribute('y') };
+		return result;
+	}
+
+	function parseSequenceDiagram(sqdCells, cdCells, allCells, fileJson) {
 		const fragments = fileJson;
 
 		// Extract lifelines from sqdCells
@@ -97,8 +195,8 @@ Draw.loadPlugin(function(editorUi)
 			id: cell.getAttribute("id"),
 			label: cell.getAttribute("value"),
 			parent: cell.getAttribute("parent"),
-			source: cell.getAttribute("source"),
-			target: cell.getAttribute("target"),
+			source: cell.getAttribute("source") || estimateClosestActivationBar(cell, lifelines, 'sourcePoint', allCells)['id'],
+			target: cell.getAttribute("target") || estimateClosestActivationBar(cell, lifelines, 'targetPoint', allCells)['id'],
 			dashed: cell.getAttribute("style").includes("dashed=1"), // true / false
 			fragment: "",
 			fragmentParent: "",
@@ -194,25 +292,8 @@ Draw.loadPlugin(function(editorUi)
 				geometry: cell.getElementsByTagName("mxGeometry")[0],
 			};
 		});
-		console.log("classes")
-		console.log(classes)
-
-		// Helper to get absolute position of a cell by summing up parent geometries
-		function getAbsolutePosition(cell) {
-			let x = 0, y = 0;
-			let current = cell;
-			while (current) {
-				const geoElem = current.geometry;
-				if (geoElem) {
-					x += parseFloat(geoElem.getAttribute("x")) || 0;
-					y += parseFloat(geoElem.getAttribute("y")) || 0;
-				}
-				const parentId = current.parent;
-				if (!parentId) break;
-				current = cdCells.find(c => c.getAttribute("id") === parentId);
-			}
-			return { x, y };
-		}
+		console.log("classes");
+		console.log(classes);
 
 		// Helper to check if a point is inside a class with optional padding
 		function pointInClass(point, classRect, padding = 10) {
@@ -253,7 +334,7 @@ Draw.loadPlugin(function(editorUi)
 				for (const classElem of classes) {
 					const geoElem = classElem.geometry;
 					if (!geoElem) continue;
-					const absPos = getAbsolutePosition(classElem);
+					const absPos = getAbsolutePosition(classElem, cdCells);
 					const classRect = {
 						x: absPos.x,
 						y: absPos.y,
