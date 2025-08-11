@@ -8,14 +8,15 @@ Draw.loadPlugin(function(editorUi)
 
 	function generateAnimation(fileJson) {
 		const { xmlDoc, sqdCells, cdCells } = parseDiagramXml(editorUi);
-		
+
 		console.log("fileJson: \n", fileJson);
 
-		const [lifelines, sqdMessages, fragments] = parseSequenceDiagram(sqdCells, cdCells, fileJson);
+		// If fileJson is not provided, use empty array for fragments
+		const [lifelines, sqdMessages, fragments] = parseSequenceDiagram(sqdCells, cdCells, fileJson || []);
 		const [cdClasses, cdRelations] = parseClassDiagram(sqdCells, cdCells);
 
 		var animationScript = buildAnimationScript(lifelines, sqdMessages, cdClasses, cdRelations, cdCells);
-	
+
 		return animationScript;
 	}
 
@@ -77,7 +78,8 @@ Draw.loadPlugin(function(editorUi)
 	}
 
 	function parseSequenceDiagram(sqdCells, cdCells, fileJson) {
-		const fragments = fileJson;
+		// If fileJson is not provided, use empty array for fragments
+		const fragments = fileJson || [];
 
 		// Extract lifelines from sqdCells
 		var lifelines = extractLifelines(sqdCells);
@@ -276,8 +278,7 @@ Draw.loadPlugin(function(editorUi)
 				label: cell.getAttribute("value"),
 				parent: cell.getAttribute("parent"),
 				source: source,
-				target: target,
-				style: cell.getAttribute("style") || ""
+				target: target
 			};
 		});
 
@@ -371,88 +372,23 @@ Draw.loadPlugin(function(editorUi)
 				return a.sourcePoint.y - b.sourcePoint.y
 			});
 
-		var fragments = new Stack();
-		var subFragments = new Stack();
-		var visitedFragments = new Set();
-		var visitedSubFragments = new Set();
+			
+		const fragmentMessages = new Map(); // key: fragmentId, value: Set of messageIds
+		const firstSubFragmentMap = new Map(); // key: fragmentId, value: firstSubFragmentId
 
 		sortedMessages.forEach(msg => {
-			if (!visited.has(msg.id)) {
-				if (msg.fragment !== "") { // TODO zatial iba pre alt, dat to do funkcii ptm aj pre loop (3x sa bude opakovat) a opt (? idk asi budeme ukazovat ze plati)
-					if (fragments.length === 0 && subFragments.length === 0) {
-						console.log("prazdne stacky")
-						fragments.push(msg.fragment);
-						subFragments.push(msg.subFragment);
-						flow.push({
-							id: msg.id,
-							label: msg.label,
-							matchedMethodId: msg.matchedMethodId,
-							source: msg.source,
-							target: msg.target,
-							fragment: msg.fragment,
-							subFragment: msg.subFragment,
-						});
-						visited.add(msg.id);
-					}
-					else {
-						if (msg.fragment === fragments.peek()) {
-							// console.log("msg.fragment === fragments.peek()")
-							if (msg.subFragment === subFragments.peek()) { // animate only objects in first subfragment
-								// console.log("msg.subFragment === subFragments.peek()")
-								flow.push({
-									id: msg.id,
-									label: msg.label,
-									matchedMethodId: msg.matchedMethodId,
-									source: msg.source,
-									target: msg.target,
-									fragment: msg.fragment,
-									subFragment: msg.subFragment,
-								});
-								visited.add(msg.id);
-							}
-							else {
-								// console.log("NIE msg.subFragment === subFragments.peek(); nebude sa animovat")
-								visited.add(msg.id);
-							}
-						}
-						else if (msg.fragmentParent === subFragments.peek()) { // vnorene ?? idk ci je to dobre
-							// console.log("vnorene");
-							fragments.push(msg.fragment);
-							subFragments.push(msg.subFragment);
-							flow.push({
-								id: msg.id,
-								label: msg.label,
-								matchedMethodId: msg.matchedMethodId,
-								source: msg.source,
-								target: msg.target,
-								fragment: msg.fragment,
-								subFragment: msg.subFragment,
-							});
-							visited.add(msg.id);
-						}
-						else {
-							visitedFragments.add(fragments.pop());
-							visitedSubFragments.add(subFragments.pop());
-							fragments.push(msg.fragment);
-							subFragments.push(msg.subFragment);
-							flow.push({
-								id: msg.id,
-								label: msg.label,
-								matchedMethodId: msg.matchedMethodId,
-								source: msg.source,
-								target: msg.target,
-								fragment: msg.fragment,
-								subFragment: msg.subFragment,
-							});
-							visited.add(msg.id);
-						}
-					}
+			if (visited.has(msg.id)) return;
+
+			if (msg.fragment !== "") {
+				if (!fragmentMessages.has(msg.fragment)) {
+					fragmentMessages.set(msg.fragment, new Set());
+					firstSubFragmentMap.set(msg.fragment, msg.subFragment);
 				}
-				else {
-					while (fragments.length > 0) {
-						visitedFragments.add(fragments.pop());
-						visitedSubFragments.add(subFragments.pop());
-					}
+
+				// Only save messages if they're in the first subfragment for this fragment
+				if (msg.subFragment === firstSubFragmentMap.get(msg.fragment)) {
+					fragmentMessages.get(msg.fragment).add(msg.id);
+
 					flow.push({
 						id: msg.id,
 						label: msg.label,
@@ -462,11 +398,119 @@ Draw.loadPlugin(function(editorUi)
 						fragment: msg.fragment,
 						subFragment: msg.subFragment,
 					});
-					visited.add(msg.id);
 				}
-				
+
+				visited.add(msg.id);
+			} else {
+				flow.push({
+					id: msg.id,
+					label: msg.label,
+					matchedMethodId: msg.matchedMethodId,
+					source: msg.source,
+					target: msg.target,
+					fragment: msg.fragment,
+					subFragment: msg.subFragment,
+				});
+				visited.add(msg.id);
 			}
 		});
+
+		// var fragments = new Stack();
+		// var subFragments = new Stack();
+		// var visitedFragments = new Set();
+		// var visitedSubFragments = new Set();
+
+		// sortedMessages.forEach(msg => {
+		// 	if (!visited.has(msg.id)) {
+		// 		if (msg.fragment !== "") { // TODO zatial iba pre alt, dat to do funkcii ptm aj pre loop (3x sa bude opakovat) a opt (? idk asi budeme ukazovat ze plati)
+		// 			if (fragments.length === 0 && subFragments.length === 0) {
+		// 				console.log("prazdne stacky")
+		// 				fragments.push(msg.fragment);
+		// 				subFragments.push(msg.subFragment);
+		// 				flow.push({
+		// 					id: msg.id,
+		// 					label: msg.label,
+		// 					matchedMethodId: msg.matchedMethodId,
+		// 					source: msg.source,
+		// 					target: msg.target,
+		// 					fragment: msg.fragment,
+		// 					subFragment: msg.subFragment,
+		// 				});
+		// 				visited.add(msg.id);
+		// 			}
+		// 			else {
+		// 				if (msg.fragment === fragments.peek()) {
+		// 					// console.log("msg.fragment === fragments.peek()")
+		// 					if (msg.subFragment === subFragments.peek()) { // animate only objects in first subfragment
+		// 						// console.log("msg.subFragment === subFragments.peek()")
+		// 						flow.push({
+		// 							id: msg.id,
+		// 							label: msg.label,
+		// 							matchedMethodId: msg.matchedMethodId,
+		// 							source: msg.source,
+		// 							target: msg.target,
+		// 							fragment: msg.fragment,
+		// 							subFragment: msg.subFragment,
+		// 						});
+		// 						visited.add(msg.id);
+		// 					}
+		// 					else {
+		// 						// console.log("NIE msg.subFragment === subFragments.peek(); nebude sa animovat")
+		// 						visited.add(msg.id);
+		// 					}
+		// 				}
+		// 				else if (msg.fragmentParent === subFragments.peek()) { // vnorene ?? idk ci je to dobre
+		// 					// console.log("vnorene");
+		// 					fragments.push(msg.fragment);
+		// 					subFragments.push(msg.subFragment);
+		// 					flow.push({
+		// 						id: msg.id,
+		// 						label: msg.label,
+		// 						matchedMethodId: msg.matchedMethodId,
+		// 						source: msg.source,
+		// 						target: msg.target,
+		// 						fragment: msg.fragment,
+		// 						subFragment: msg.subFragment,
+		// 					});
+		// 					visited.add(msg.id);
+		// 				}
+		// 				else {
+		// 					visitedFragments.add(fragments.pop());
+		// 					visitedSubFragments.add(subFragments.pop());
+		// 					fragments.push(msg.fragment);
+		// 					subFragments.push(msg.subFragment);
+		// 					flow.push({
+		// 						id: msg.id,
+		// 						label: msg.label,
+		// 						matchedMethodId: msg.matchedMethodId,
+		// 						source: msg.source,
+		// 						target: msg.target,
+		// 						fragment: msg.fragment,
+		// 						subFragment: msg.subFragment,
+		// 					});
+		// 					visited.add(msg.id);
+		// 				}
+		// 			}
+		// 		}
+		// 		else {
+		// 			while (fragments.length > 0) {
+		// 				visitedFragments.add(fragments.pop());
+		// 				visitedSubFragments.add(subFragments.pop());
+		// 			}
+		// 			flow.push({
+		// 				id: msg.id,
+		// 				label: msg.label,
+		// 				matchedMethodId: msg.matchedMethodId,
+		// 				source: msg.source,
+		// 				target: msg.target,
+		// 				fragment: msg.fragment,
+		// 				subFragment: msg.subFragment,
+		// 			});
+		// 			visited.add(msg.id);
+		// 		}
+				
+		// 	}
+		// });
 
 		console.log("Sequence Flow (ordered):", flow);
 		flow.forEach((msg, idx) => {
@@ -550,20 +594,20 @@ Draw.loadPlugin(function(editorUi)
 		}
 		wait();
 
-		var frag = [];
+		console.log("fragmentMessages")
+		console.log(fragmentMessages)
 
 		flow.forEach((msg) => {
 			const sourceLifeline = findLifelineByBarId(msg.source);
 			const targetLifeline = findLifelineByBarId(msg.target);
 
-			if (msg.fragment !== "") { // TODO ani toto neviem ci je ok
-				frag.push(msg.fragment);
+			if (msg.fragment !== "") { 
 				animateFragment(msg.fragment);
 			}
 			if (calls.some(call => call.id === msg.id)) {
 				animateCall(msg, sourceLifeline, targetLifeline);
 			} else if (returns.some(ret => ret.id === msg.id)) {
-				animateReturn(msg, sourceLifeline, targetLifeline, frag);
+				animateReturn(msg, sourceLifeline, targetLifeline);
 			}
 		});
 
@@ -571,8 +615,7 @@ Draw.loadPlugin(function(editorUi)
 		function animateFragment(fragment) {
 			if (!highlighted.has(fragment)) {
 				highlightCell(fragment);
-			}
-			wait();			
+			}			
 		}
 
 		// Animate a call
@@ -610,18 +653,12 @@ Draw.loadPlugin(function(editorUi)
 		}
 
 		// Animate a return step
-		function animateReturn(msg, sourceLifeline, targetLifeline, frag) {
+		function animateReturn(msg, sourceLifeline, targetLifeline) {
 			const matchingCall = findMatchingCall(msg);
 			if (!highlighted.has(msg.id)) { 								// highlight return sipky v SqD
 				highlightArrow(msg.id);
 			}
 			wait();
-			if (msg.fragment !== "") {
-				var fragPop = frag.pop()
-				if (frag.length === 0) {
-					unhighlight(fragPop)
-				}
-			}
 			if (matchingCall.matchedMethodId && highlighted.has(matchingCall.matchedMethodId)) { // UNhighlight metody v CD
 				unhighlight(matchingCall.matchedMethodId);
 			}
@@ -643,12 +680,24 @@ Draw.loadPlugin(function(editorUi)
 					removeInterDiagramLink(sourceLifeline.matchedClassId, sourceLifeline.id);
 				}
 			}
-			if (highlighted.has(msg.id)) { 									// UNhighlight return sipky v SqD
-				unhighlight(msg.id);
-			}
 			const relation = findRelationBetweenClasses(targetLifeline.matchedClassId, sourceLifeline.matchedClassId);
 			if (relation && highlighted.has(relation.id)) {
 				unhighlight(relation.id);									// UNhighlight sipky medzi triedami v CD
+			}
+			if (highlighted.has(msg.id)) { 									// UNhighlight return sipky v SqD
+				unhighlight(msg.id);
+			}
+			if (msg.fragment !== "" && highlighted.has(msg.fragment)) {
+				console.log(`has fragment ${msg.fragment}, pop msg.id ${msg.id}`)
+				console.log(fragmentMessages.get(msg.fragment))
+				if (fragmentMessages.get(msg.fragment).delete(msg.id)) { 
+					console.log(fragmentMessages.get(msg.fragment))
+					if (fragmentMessages.get(msg.fragment).size === 0) {
+						fragmentMessages.delete(msg.fragment);
+						unhighlight(msg.fragment)
+						console.log("HIDE FRAG")
+					}
+				}			
 			}
 			wait();
 		}
@@ -696,39 +745,52 @@ Draw.loadPlugin(function(editorUi)
 	}
 
 	editorUi.actions.addAction('generateCustomAnim', function() {
-		const input = document.createElement('input');
-		input.type = 'file';
-		input.accept = '.json'; // Accept only JSON files
+		// Ask the user if they want to load a JSON file
+		if (confirm('Do you want to load a JSON file with fragments? Click "OK" to load, or "Cancel" to skip.')) {
+			const input = document.createElement('input');
+			input.type = 'file';
+			input.accept = '.json'; // Accept only JSON files
 
-		input.addEventListener('change', function () {
-			const file = input.files[0];
-			if (!file) return;
+			input.addEventListener('change', function () {
+				const file = input.files[0];
+				if (!file) return;
 
-			const reader = new FileReader();
+				const reader = new FileReader();
 
-			reader.onload = function (e) {
-				var fileJson;
-				try {
-					fileJson = JSON.parse(e.target.result); 
-				} catch (err) {
-					alert('Invalid JSON file.');
-					console.error(err);
-				}
-				const animation = generateAnimation(fileJson);
+				reader.onload = function (e) {
+					var fileJson;
+					try {
+						fileJson = JSON.parse(e.target.result);
+					} catch (err) {
+						alert('Invalid JSON file.');
+						console.error(err);
+					}
+					const animation = generateAnimation(fileJson);
 
-				// Save as a text file (one label per line)
-				const blob = new Blob([animation], { type: 'text/plain' });
-				const a = document.createElement('a');
-				a.href = URL.createObjectURL(blob);
-				a.download = 'animation.txt';
-				document.body.appendChild(a);
-				a.click();
-				document.body.removeChild(a);
-			};
-			reader.readAsText(file); 
-		});
+					// Save as a text file (one label per line)
+					const blob = new Blob([animation], { type: 'text/plain' });
+					const a = document.createElement('a');
+					a.href = URL.createObjectURL(blob);
+					a.download = 'animation.txt';
+					document.body.appendChild(a);
+					a.click();
+					document.body.removeChild(a);
+				};
+				reader.readAsText(file);
+			});
 
-		input.click();
+			input.click();
+		} else {
+			// No JSON file, call generateAnimation with no fileJson
+			const animation = generateAnimation();
+			const blob = new Blob([animation], { type: 'text/plain' });
+			const a = document.createElement('a');
+			a.href = URL.createObjectURL(blob);
+			a.download = 'animation.txt';
+			document.body.appendChild(a);
+			a.click();
+			document.body.removeChild(a);
+		}
 	});
 
 	var menu = editorUi.menus.get('extras');
@@ -740,21 +802,3 @@ Draw.loadPlugin(function(editorUi)
 	};
 });
 
-
-class Stack {
-  constructor() {
-    this.items = [];
-  }
-
-  push(item) {
-    this.items.push(item);
-  }
-
-  pop() {
-    return this.items.pop();
-  }
-
-  peek() {
-    return this.items[this.items.length - 1];
-  }
-}
