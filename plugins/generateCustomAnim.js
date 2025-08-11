@@ -917,39 +917,16 @@ Draw.loadPlugin(function(editorUi)
 	}
 
 	editorUi.actions.addAction('generateCustomAnim', function() {
-		const input = document.createElement('input');
-		input.type = 'file';
-		input.accept = '.json'; // Accept only JSON files
+		const animation = generateAnimation();
 
-		input.addEventListener('change', function () {
-			const file = input.files[0];
-			if (!file) return;
-
-			const reader = new FileReader();
-
-			reader.onload = function (e) {
-				var fileJson;
-				try {
-					fileJson = JSON.parse(e.target.result); 
-				} catch (err) {
-					alert('Invalid JSON file.');
-					console.error(err);
-				}
-				const animation = generateAnimation(fileJson);
-
-				// Save as a text file (one label per line)
-				const blob = new Blob([animation], { type: 'text/plain' });
-				const a = document.createElement('a');
-				a.href = URL.createObjectURL(blob);
-				a.download = 'animation.txt';
-				document.body.appendChild(a);
-				a.click();
-				document.body.removeChild(a);
-			};
-			reader.readAsText(file); 
-		});
-
-		input.click();
+		// Save as a text file (one label per line)
+		const blob = new Blob([animation], { type: 'text/plain' });
+		const a = document.createElement('a');
+		a.href = URL.createObjectURL(blob);
+		a.download = 'animation.txt';
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
 	});
 
 	var menu = editorUi.menus.get('extras');
