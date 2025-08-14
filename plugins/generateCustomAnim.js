@@ -14,7 +14,7 @@ Draw.loadPlugin(function(editorUi)
 		const [lifelines, sqdMessages, fragments] = parseSequenceDiagram(sqdCells, cdCells, allCells, fileJson);
 		const [cdClasses, cdRelations] = parseClassDiagram(sqdCells, cdCells);
 
-		var animationScript = buildAnimationScript(lifelines, sqdMessages, cdClasses, cdRelations, cdCells);
+		var animationScript = buildAnimationScript(lifelines, sqdMessages, cdClasses, cdRelations, cdCells, allCells);
 	
 		return animationScript;
 	}
@@ -556,7 +556,7 @@ Draw.loadPlugin(function(editorUi)
 	}
 
 	// Build the animation script for the animation.js plugin
-	function buildAnimationScript(lifelines, messages, cdClasses, cdRelations, cdCells) {
+	function buildAnimationScript(lifelines, messages, cdClasses, cdRelations, cdCells, allCells) {
 		// Build a map from source to messages for quick traversal
 		var sourceMap = new Map();
 		var targetSet = new Set();
@@ -709,23 +709,36 @@ Draw.loadPlugin(function(editorUi)
 		}
 		
 		// Helper to find a call for a return arrow
-		function findMatchingCall(msg) { 
+		function findMatchingCall(msg, allCells) {
 			if (!msg.source || !msg.target) return null;
-			const reversed = calls.filter(call =>
-				call.source === msg.target &&
-				call.target === msg.source
-			);
-			if (msg.sourcePoint) {
-				const above = reversed.filter(call =>
-					call.sourcePoint && call.sourcePoint.y < msg.sourcePoint.y
-				);
-				if (above.length > 0) {
-					// Pick the closest one above (max y)
-					return above.sort((a, b) => b.sourcePoint.y - a.sourcePoint.y)[0];
-				}
-			}
-			// Fallback: just return the first reversed call if any
-			return reversed.length > 0 ? reversed[0] : null;
+
+			var rawMsg = allCells.filter(c => c.id == msg.id)[0].raw;
+			const returnLine = {
+				id: msg.id,
+				y: getAbsolutePositionOfLine(rawMsg, getLineCoordinates(rawMsg, "targetPoint"), allCells).y
+			};
+
+			const reversed
+				= calls.filter(call =>
+					call.source === msg.target &&
+					call.target === msg.source
+				).map(call => {
+					var rawCall = allCells.filter(c => c.id == call.id)[0].raw;
+					return {
+						id: call.id,
+						y: getAbsolutePositionOfLine(rawCall, getLineCoordinates(rawCall, "targetPoint"), allCells).y
+					}
+				});
+			if (reversed.length <= 0) { return null; }
+
+			const above = reversed.filter(call => call.y < returnLine.y);
+			if (above.length <= 0) { return null; }
+
+			above.sort((a,b) => a.y-b.y);
+
+			var matchingCallId = above[above.length-1].id;
+			var matchingCall = calls.filter(call => call.id == matchingCallId)[0];
+			return matchingCall;
 		}
 
 		// Animation helpers
@@ -784,7 +797,7 @@ Draw.loadPlugin(function(editorUi)
 			if (calls.some(call => call.id === msg.id)) {
 				animateCall(msg, sourceLifeline, targetLifeline);
 			} else if (returns.some(ret => ret.id === msg.id)) {
-				animateReturn(msg, sourceLifeline, targetLifeline, frag);
+				animateReturn(msg, sourceLifeline, targetLifeline, frag, allCells);
 			}
 		});
 
@@ -831,8 +844,8 @@ Draw.loadPlugin(function(editorUi)
 		}
 
 		// Animate a return step
-		function animateReturn(msg, sourceLifeline, targetLifeline, frag) {
-			const matchingCall = findMatchingCall(msg);
+		function animateReturn(msg, sourceLifeline, targetLifeline, frag, allCells) {
+			const matchingCall = findMatchingCall(msg, allCells);
 			if (!highlighted.has(msg.id)) { 								// highlight return sipky v SqD
 				highlightArrow(msg.id);
 			}
