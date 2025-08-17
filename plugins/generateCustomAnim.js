@@ -7,16 +7,15 @@ Draw.loadPlugin(function(editorUi)
 	mxResources.parse('generateCustomAnim=Generate Custom Animation...');
 
 	function generateAnimation(fileJson) {
-		const { xmlDoc, sqdCells, cdCells } = parseDiagramXml(editorUi);
-
+		const { xmlDoc, sqdCells, cdCells, allCells } = parseDiagramXml(editorUi);
+		
 		console.log("fileJson: \n", fileJson);
 
-		// If fileJson is not provided, use empty array for fragments
-		const [lifelines, sqdMessages, fragments] = parseSequenceDiagram(sqdCells, cdCells, fileJson || []);
+		const [lifelines, sqdMessages, fragments] = parseSequenceDiagram(sqdCells, cdCells, allCells, fileJson);
 		const [cdClasses, cdRelations] = parseClassDiagram(sqdCells, cdCells);
 
-		var animationScript = buildAnimationScript(lifelines, sqdMessages, cdClasses, cdRelations, cdCells);
-
+		var animationScript = buildAnimationScript(lifelines, sqdMessages, cdClasses, cdRelations, cdCells, allCells);
+	
 		return animationScript;
 	}
 
@@ -27,24 +26,93 @@ Draw.loadPlugin(function(editorUi)
 	       
 		console.log("parseDiagramXml: parsed XML document\n", xml);
 
-		var cells = Array.from(xmlDoc.getElementsByTagName("mxCell"));
+		var allCells = Array.from(xmlDoc.getElementsByTagName("mxCell"));
 
-		const sqdCells = getDiagramCells(cells, "SqD")   // SqD - name of layer for sequence diagram
-		const cdCells  = getDiagramCells(cells, "CD");   //  CD - name of layer for class diagram
+		const sqdCells = getDiagramCells(allCells, "SqD")   // SqD - name of layer for sequence diagram
+		const cdCells  = getDiagramCells(allCells, "CD");   //  CD - name of layer for class diagram
 
-		return { xmlDoc, sqdCells, cdCells };
+		allCells = allCells.map(cell => {
+			return {
+				id: cell.getAttribute("id"),
+				raw: cell,
+				label: cell.getAttribute("value"),
+				parent: cell.getAttribute("parent"),
+				is_edge: cell.getAttribute('edge') == '1',
+				is_vertex: cell.getAttribute('vertex') == '1',
+				geometry: cell.getElementsByTagName("mxGeometry")[0],
+			};
+		});
+
+		return { xmlDoc, sqdCells, cdCells, allCells };
+	}
+
+	function getClosestLifeline(activationBar, lifelines, allCells) {
+		let abCoordinates = {
+			'id': activationBar.id,
+			'x': activationBar.geometry.getAttribute('x'),
+			'y': activationBar.geometry.getAttribute('y'),
+			'width': parseFloat(activationBar.geometry.getAttribute('width')),
+			'height': parseFloat(activationBar.geometry.getAttribute('height'))
+		};
+
+		let abAbsoluteCoordinates = getAbsolutePosition(activationBar, allCells);
+		abCoordinates.x = abAbsoluteCoordinates.x;
+		abCoordinates.y = abAbsoluteCoordinates.y;
+
+		let abMiddlePoint = {
+			'x': abCoordinates.x + abCoordinates.width/2,
+			'y': abCoordinates.y + abCoordinates.height/2
+		};
+
+		let lifelinesCoordinates = lifelines.map(lf => {
+			let lfCoordinates = {
+				'id': lf.id,
+				'x': lf.geometry.getAttribute('x'),
+				'y': lf.geometry.getAttribute('y'),
+				'width': parseFloat(lf.geometry.getAttribute('width')),
+				'height': parseFloat(lf.geometry.getAttribute('height'))
+			};
+
+			let lfAbsoluteCoordinates = getAbsolutePosition(lf, allCells);
+			lfCoordinates.x = lfAbsoluteCoordinates.x;
+			lfCoordinates.y = lfAbsoluteCoordinates.y;
+
+			return lfCoordinates;
+		});
+
+		lifelinesCoordinates.sort((a,b) => {
+			let aDist = distanceOfLinePointAndActivationBar(abMiddlePoint, a);
+			let bDist = distanceOfLinePointAndActivationBar(abMiddlePoint, b);
+
+			if (aDist < bDist) { return -1; }
+			else if (aDist > bDist) { return 1; }
+
+			return 0;
+		});
+
+		return lifelinesCoordinates[0];
 	}
 
 	// Helper to extract lifeline with its activation bars
-	function extractLifelines(cells) {			
-		return cells.filter(cell =>
+	function extractLifelines(sqdCells, allCells) {			
+		var lifelines = sqdCells.filter(cell =>
 			cell.getAttribute("style") && cell.getAttribute("style").includes("shape=umlLifeline")
 		).map(cell => {
-			const activationBars = cells
+			return {
+				id: cell.getAttribute("id"),
+				label: cell.getAttribute("value"),
+				parent: cell.getAttribute("parent"),
+				geometry: cell.getElementsByTagName("mxGeometry")[0],
+				activationBars: []
+			};
+		});
+
+		const activationBars
+			= allCells
+				.map(c => c.raw)
 				.filter(c =>
-					c.getAttribute("vertex") === "1" &&
-					c.getAttribute("parent") === cell.getAttribute("id") &&
-					(!c.getAttribute("style") || !c.getAttribute("style").includes("shape=umlLifeline"))
+					c.getAttribute("vertex") === "1" 
+					&& c.getAttribute("style").includes("targetShapes=umlLifeline")
 				)
 				.filter(c => {
 					const geoElem = c.getElementsByTagName("mxGeometry")[0];
@@ -61,28 +129,196 @@ Draw.loadPlugin(function(editorUi)
 					const height = parseFloat(geoElem.getAttribute("height"));
 					return {
 						id: c.getAttribute("id"),
+						parent: c.getAttribute("parent"),
 						x: x,
 						y: y,
-						widht: width,
-						height: height
+						width: width,
+						height: height,
+						geometry: geoElem,
+						lifeline: null
 					};
 				});
 
-			return {
-				id: cell.getAttribute("id"),
-				label: cell.getAttribute("value"),
-				parent: cell.getAttribute("parent"),
-				activationBars: activationBars
-			};
-		});
+			activationBars.forEach(ab => {
+				ab.lifeline = getClosestLifeline(ab, lifelines, allCells).id;
+			});
+
+			lifelines.forEach(lf => {
+				lf.activationBars = activationBars.filter(ab => ab.lifeline == lf.id)
+			});
+
+		return lifelines;
 	}
 
-	function parseSequenceDiagram(sqdCells, cdCells, fileJson) {
-		// If fileJson is not provided, use empty array for fragments
-		const fragments = fileJson || [];
+	// Helper to get absolute position of a cell by summing up parent geometries
+	function getAbsolutePosition(cell, diagramCells) {
+		let x = 0, y = 0;
+		let current = cell;
+		while (current) {
+			const geoElem = current.geometry;
+			if (geoElem) {
+				x += parseFloat(geoElem.getAttribute("x")) || 0;
+				y += parseFloat(geoElem.getAttribute("y")) || 0;
+			}
+			const parentId = current.parent;
+			if (!parentId || parentId == '0') break;
+			current = diagramCells.find(c => c.id === parentId);
+		}
+
+		return { x, y };
+	}
+
+	function getAbsolutePositionOfLine(cell, coordinates, diagramCells) {
+		let absolutePosition = { 'x': parseFloat(coordinates['x']), 'y': parseFloat(coordinates['y']) };
+		
+		let parent_id = cell.parent || cell.getAttribute('parent');
+		let parent =  diagramCells.find(c => c.id === parent_id);
+		if (parent) {
+			let parentAbsolutePosition = getAbsolutePosition(parent, diagramCells);
+			absolutePosition['x'] = absolutePosition['x'] + parentAbsolutePosition['x'];
+			absolutePosition['y'] = absolutePosition['y'] + parentAbsolutePosition['y'];
+		}
+
+		return absolutePosition;
+	}
+
+
+	// Hinted by GPT - How do I calculate distance of a single point to the closest point of a rectangle?
+	function clamp(val, min, max) {
+		return Math.max(min, Math.min(max, val));
+	}
+
+	// Hinted by GPT - How do I calculate distance of a single point to the closest point of a rectangle?
+	function distanceOfLinePointAndActivationBar(linePointPosition, activationBarPosition){
+		let closestX = clamp(linePointPosition['x'], activationBarPosition['x'], activationBarPosition['x'] + activationBarPosition['width']);
+		let closestY = clamp(linePointPosition['y'], activationBarPosition['y'], activationBarPosition['y'] + activationBarPosition['height']);
+		let dx = linePointPosition['x'] - closestX;
+		let dy = linePointPosition['y'] - closestY;
+		let distance = Math.sqrt(dx * dx + dy * dy);
+		return distance;
+	}
+
+	function estimateClosestActivationBar(cell, lifelines, coordinateName, diagramCells) {
+		let closestActivationBar = null;
+		let absPositionOfCell = getAbsolutePositionOfLine(cell, getLineCoordinates(cell, coordinateName), diagramCells);
+
+		lifelines.forEach((lf) => {
+			lf.activationBars.forEach((ab) => {
+				if (!closestActivationBar) {
+					closestActivationBar = ab;
+				}
+				else {
+					let currentAbAbsolutePosition = getAbsolutePosition(ab, diagramCells);
+					currentAbAbsolutePosition['height'] = ab['height'];
+					currentAbAbsolutePosition['width'] = ab['width'];
+
+					let bestAbAbsolutePosition = getAbsolutePosition(closestActivationBar, diagramCells);
+					bestAbAbsolutePosition['height'] = closestActivationBar['height'];
+					bestAbAbsolutePosition['width'] = closestActivationBar['width'];
+
+					let distanceToCurrentActivationBar = distanceOfLinePointAndActivationBar(absPositionOfCell, currentAbAbsolutePosition);
+					let distanceToBestActivationBar = distanceOfLinePointAndActivationBar(absPositionOfCell, bestAbAbsolutePosition);
+
+					if (distanceToCurrentActivationBar < distanceToBestActivationBar) {
+						closestActivationBar = ab;
+					}
+				}
+			})
+		})
+
+		return closestActivationBar;
+	}
+
+	function getLineCoordinates(cell, coordinateName) {
+		let a = cell.getElementsByTagName('mxGeometry')[0];
+		let b = a.getElementsByTagName('mxPoint');
+		let coordinateCell = Array.from(b).filter(el => el.getAttribute("as") == coordinateName)[0];
+		let result = { 'x': coordinateCell.getAttribute('x'), 'y': coordinateCell.getAttribute('y') };
+		return result;
+	}
+	
+	const fragTypes = ['alt', 'opt', 'loop', 'par'];
+	function extractFragmentsAndLinesHierarchy(allCells) {
+		let fragCells = allCells.filter(cell => fragTypes.includes(cell.label));
+		let fragments = fragCells.map(cell => {
+			let absPos = getAbsolutePosition(cell, allCells);
+			let fragment = {
+				'id': cell.id,
+				'value': cell.label,
+				'y': absPos['y'],
+				'height': cell.geometry.getAttribute('height'),
+				'child_areas': allCells.filter(ca => ca.parent == cell.id).map(ca => {
+					let childAreaMetadata = {
+						'id': ca.id,
+						'value': ca.label,
+						'y': getAbsolutePosition(ca, allCells)['y'],
+						'height': ca.geometry.getAttribute('height'),
+						'lines': []
+					};
+					return childAreaMetadata;
+				}),
+				'parent': cell.parent
+			};
+			return fragment;
+		});
+
+		let allChildAreaIds = fragments.map(frag => frag['child_areas']).reduce((acc, v) => acc.concat(v), []).map(ca => ca['id']);
+		fragments.forEach(frag => {
+			frag['parent'] = allChildAreaIds.includes(frag['parent']) ? frag['parent'] : null;
+		});
+
+		fragments.sort((a,b) => {
+			if (a.y < b.y) {
+				return -1;
+			} else if (a > b) {
+				return 1;
+			}
+			// a must be equal to b
+			return 0;
+		});
+
+		let lineCells = allCells.filter(line => line.is_edge).map(line => {
+			return {
+				'id': line.id,
+				'value': line.label,
+				'y': getAbsolutePositionOfLine(line, 'targetPoint', allCells)
+			};
+		});
+		lineCells.sort((a,b) => {
+			if (a.y < b.y) {
+				return -1;
+			} else if (a > b) {
+				return 1;
+			}
+			// a must be equal to b
+			return 0;
+		});
+
+		var found = false;
+		lineCells.forEach(line => {
+			for(let i = fragments.length - 1; i >= 0; i--) {
+				fragments[i]['child_areas'].forEach(ca => {
+					if(line['y'] >= ca['y'] && line['y'] <= (ca['y'] + ca['height'])) {
+						ca['lines'].append(line);
+						found = true;
+						return;
+					}
+				});
+
+				if (found) {
+					break;
+				}
+			}
+		});
+
+		return fragments;
+	}
+
+	function parseSequenceDiagram(sqdCells, cdCells, allCells, fileJson) {
+		const fragments = extractFragmentsAndLinesHierarchy(allCells);
 
 		// Extract lifelines from sqdCells
-		var lifelines = extractLifelines(sqdCells);
+		var lifelines = extractLifelines(sqdCells, allCells);
 
 		// Match lifelines to classes by label 
 		lifelines.forEach(lf => {
@@ -99,8 +335,8 @@ Draw.loadPlugin(function(editorUi)
 			id: cell.getAttribute("id"),
 			label: cell.getAttribute("value"),
 			parent: cell.getAttribute("parent"),
-			source: cell.getAttribute("source"),
-			target: cell.getAttribute("target"),
+			source: cell.getAttribute("source") || estimateClosestActivationBar(cell, lifelines, 'sourcePoint', allCells)['id'],
+			target: cell.getAttribute("target") || estimateClosestActivationBar(cell, lifelines, 'targetPoint', allCells)['id'],
 			dashed: cell.getAttribute("style").includes("dashed=1"), // true / false
 			fragment: "",
 			fragmentParent: "",
@@ -196,25 +432,8 @@ Draw.loadPlugin(function(editorUi)
 				geometry: cell.getElementsByTagName("mxGeometry")[0],
 			};
 		});
-		console.log("classes")
-		console.log(classes)
-
-		// Helper to get absolute position of a cell by summing up parent geometries
-		function getAbsolutePosition(cell) {
-			let x = 0, y = 0;
-			let current = cell;
-			while (current) {
-				const geoElem = current.geometry;
-				if (geoElem) {
-					x += parseFloat(geoElem.getAttribute("x")) || 0;
-					y += parseFloat(geoElem.getAttribute("y")) || 0;
-				}
-				const parentId = current.parent;
-				if (!parentId) break;
-				current = cdCells.find(c => c.getAttribute("id") === parentId);
-			}
-			return { x, y };
-		}
+		console.log("classes");
+		console.log(classes);
 
 		// Helper to check if a point is inside a class with optional padding
 		function pointInClass(point, classRect, padding = 10) {
@@ -255,7 +474,7 @@ Draw.loadPlugin(function(editorUi)
 				for (const classElem of classes) {
 					const geoElem = classElem.geometry;
 					if (!geoElem) continue;
-					const absPos = getAbsolutePosition(classElem);
+					const absPos = getAbsolutePosition(classElem, cdCells);
 					const classRect = {
 						x: absPos.x,
 						y: absPos.y,
@@ -336,7 +555,7 @@ Draw.loadPlugin(function(editorUi)
 	}
 
 	// Build the animation script for the animation.js plugin
-	function buildAnimationScript(lifelines, messages, cdClasses, cdRelations, cdCells) {
+	function buildAnimationScript(lifelines, messages, cdClasses, cdRelations, cdCells, allCells) {
 		// Build a map from source to messages for quick traversal
 		var sourceMap = new Map();
 		var targetSet = new Set();
@@ -532,23 +751,36 @@ Draw.loadPlugin(function(editorUi)
 		}
 		
 		// Helper to find a call for a return arrow
-		function findMatchingCall(msg) { 
+		function findMatchingCall(msg, allCells) {
 			if (!msg.source || !msg.target) return null;
-			const reversed = calls.filter(call =>
-				call.source === msg.target &&
-				call.target === msg.source
-			);
-			if (msg.sourcePoint) {
-				const above = reversed.filter(call =>
-					call.sourcePoint && call.sourcePoint.y < msg.sourcePoint.y
-				);
-				if (above.length > 0) {
-					// Pick the closest one above (max y)
-					return above.sort((a, b) => b.sourcePoint.y - a.sourcePoint.y)[0];
-				}
-			}
-			// Fallback: just return the first reversed call if any
-			return reversed.length > 0 ? reversed[0] : null;
+
+			var rawMsg = allCells.filter(c => c.id == msg.id)[0].raw;
+			const returnLine = {
+				id: msg.id,
+				y: getAbsolutePositionOfLine(rawMsg, getLineCoordinates(rawMsg, "targetPoint"), allCells).y
+			};
+
+			const reversed
+				= calls.filter(call =>
+					call.source === msg.target &&
+					call.target === msg.source
+				).map(call => {
+					var rawCall = allCells.filter(c => c.id == call.id)[0].raw;
+					return {
+						id: call.id,
+						y: getAbsolutePositionOfLine(rawCall, getLineCoordinates(rawCall, "targetPoint"), allCells).y
+					}
+				});
+			if (reversed.length <= 0) { return null; }
+
+			const above = reversed.filter(call => call.y < returnLine.y);
+			if (above.length <= 0) { return null; }
+
+			above.sort((a,b) => a.y-b.y);
+
+			var matchingCallId = above[above.length-1].id;
+			var matchingCall = calls.filter(call => call.id == matchingCallId)[0];
+			return matchingCall;
 		}
 
 		// Animation helpers
@@ -607,7 +839,7 @@ Draw.loadPlugin(function(editorUi)
 			if (calls.some(call => call.id === msg.id)) {
 				animateCall(msg, sourceLifeline, targetLifeline);
 			} else if (returns.some(ret => ret.id === msg.id)) {
-				animateReturn(msg, sourceLifeline, targetLifeline);
+				animateReturn(msg, sourceLifeline, targetLifeline, allCells);
 			}
 		});
 
@@ -653,8 +885,8 @@ Draw.loadPlugin(function(editorUi)
 		}
 
 		// Animate a return step
-		function animateReturn(msg, sourceLifeline, targetLifeline) {
-			const matchingCall = findMatchingCall(msg);
+		function animateReturn(msg, sourceLifeline, targetLifeline, allCells) {
+			const matchingCall = findMatchingCall(msg, allCells);
 			if (!highlighted.has(msg.id)) { 								// highlight return sipky v SqD
 				highlightArrow(msg.id);
 			}
@@ -745,52 +977,16 @@ Draw.loadPlugin(function(editorUi)
 	}
 
 	editorUi.actions.addAction('generateCustomAnim', function() {
-		// Ask the user if they want to load a JSON file
-		if (confirm('Do you want to load a JSON file with fragments? Click "OK" to load, or "Cancel" to skip.')) {
-			const input = document.createElement('input');
-			input.type = 'file';
-			input.accept = '.json'; // Accept only JSON files
+		const animation = generateAnimation();
 
-			input.addEventListener('change', function () {
-				const file = input.files[0];
-				if (!file) return;
-
-				const reader = new FileReader();
-
-				reader.onload = function (e) {
-					var fileJson;
-					try {
-						fileJson = JSON.parse(e.target.result);
-					} catch (err) {
-						alert('Invalid JSON file.');
-						console.error(err);
-					}
-					const animation = generateAnimation(fileJson);
-
-					// Save as a text file (one label per line)
-					const blob = new Blob([animation], { type: 'text/plain' });
-					const a = document.createElement('a');
-					a.href = URL.createObjectURL(blob);
-					a.download = 'animation.txt';
-					document.body.appendChild(a);
-					a.click();
-					document.body.removeChild(a);
-				};
-				reader.readAsText(file);
-			});
-
-			input.click();
-		} else {
-			// No JSON file, call generateAnimation with no fileJson
-			const animation = generateAnimation();
-			const blob = new Blob([animation], { type: 'text/plain' });
-			const a = document.createElement('a');
-			a.href = URL.createObjectURL(blob);
-			a.download = 'animation.txt';
-			document.body.appendChild(a);
-			a.click();
-			document.body.removeChild(a);
-		}
+		// Save as a text file (one label per line)
+		const blob = new Blob([animation], { type: 'text/plain' });
+		const a = document.createElement('a');
+		a.href = URL.createObjectURL(blob);
+		a.download = 'animation.txt';
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
 	});
 
 	var menu = editorUi.menus.get('extras');
