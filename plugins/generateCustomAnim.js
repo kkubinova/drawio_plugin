@@ -6,12 +6,10 @@ Draw.loadPlugin(function(editorUi)
 	// Adds resource for action
 	mxResources.parse('generateCustomAnim=Generate Custom Animation...');
 
-	function generateAnimation(fileJson) {
+	function generateAnimation() {
 		const { xmlDoc, sqdCells, cdCells, allCells } = parseDiagramXml(editorUi);
 		
-		console.log("fileJson: \n", fileJson);
-
-		const [lifelines, sqdMessages, fragments] = parseSequenceDiagram(sqdCells, cdCells, allCells, fileJson);
+		const [lifelines, sqdMessages, fragments] = parseSequenceDiagram(sqdCells, cdCells, allCells);
 		const [cdClasses, cdRelations] = parseClassDiagram(sqdCells, cdCells);
 
 		var animationScript = buildAnimationScript(lifelines, sqdMessages, cdClasses, cdRelations, cdCells, allCells);
@@ -170,7 +168,7 @@ Draw.loadPlugin(function(editorUi)
 
 	function getAbsolutePositionOfLine(cell, coordinates, diagramCells) {
 		let absolutePosition = { 'x': parseFloat(coordinates['x']), 'y': parseFloat(coordinates['y']) };
-		
+
 		let parent_id = cell.parent || cell.getAttribute('parent');
 		let parent =  diagramCells.find(c => c.id === parent_id);
 		if (parent) {
@@ -238,7 +236,7 @@ Draw.loadPlugin(function(editorUi)
 	}
 	
 	const fragTypes = ['alt', 'opt', 'loop', 'par'];
-	function extractFragmentsAndLinesHierarchy(allCells) {
+	function extractFragmentsAndLinesHierarchy(allCells, messages) {
 		let fragCells = allCells.filter(cell => fragTypes.includes(cell.label));
 		let fragments = fragCells.map(cell => {
 			let absPos = getAbsolutePosition(cell, allCells);
@@ -277,35 +275,43 @@ Draw.loadPlugin(function(editorUi)
 			return 0;
 		});
 
-		let lineCells = allCells.filter(line => line.is_edge).map(line => {
-			return {
-				'id': line.id,
-				'value': line.label,
-				'y': getAbsolutePositionOfLine(line, 'targetPoint', allCells)
-			};
-		});
-		lineCells.sort((a,b) => {
+		messages.sort((a,b) => {
 			if (a.y < b.y) {
 				return -1;
-			} else if (a > b) {
+			} else if (a.y > b.y) {
 				return 1;
 			}
-			// a must be equal to b
 			return 0;
 		});
 
-		var found = false;
-		lineCells.forEach(line => {
+		messages.forEach(line => {
+			let assigned = false;
 			for(let i = fragments.length - 1; i >= 0; i--) {
-				fragments[i]['child_areas'].forEach(ca => {
-					if(line['y'] >= ca['y'] && line['y'] <= (ca['y'] + ca['height'])) {
-						ca['lines'].append(line);
-						found = true;
-						return;
-					}
-				});
+				const fragment = fragments[i];
+				for (let j = 0; j < fragment['child_areas'].length; j++) {
+					const ca = fragment['child_areas'][j];
 
-				if (found) {
+					// Special handling for 'alt' fragments based on message label
+					if (fragment.value === 'alt') {
+						if (line.label === 'allowed' && ca.value.includes('Eligible')) {
+							ca['lines'].push(line);
+							assigned = true;
+							break;
+						} else if (line.label === 'not allowed' && ca.value.includes('Not eligible')) {
+							ca['lines'].push(line);
+							assigned = true;
+							break;
+						}
+					} else {
+						// Existing logic for other fragment types or if no specific label match
+						if(line['y'] >= ca['y'] && line['y'] <= (ca['y'] + ca['height'])) {
+							ca['lines'].push(line);
+							assigned = true;
+							break;
+						}
+					}
+				}
+				if (assigned) {
 					break;
 				}
 			}
@@ -314,9 +320,7 @@ Draw.loadPlugin(function(editorUi)
 		return fragments;
 	}
 
-	function parseSequenceDiagram(sqdCells, cdCells, allCells, fileJson) {
-		const fragments = extractFragmentsAndLinesHierarchy(allCells);
-
+	function parseSequenceDiagram(sqdCells, cdCells, allCells) {
 		// Extract lifelines from sqdCells
 		var lifelines = extractLifelines(sqdCells, allCells);
 
@@ -331,17 +335,24 @@ Draw.loadPlugin(function(editorUi)
 		// Extract messages/arrows (edge="1") from sqdCells
 		var messages = sqdCells.filter(cell =>
 			cell.getAttribute("edge") === "1"
-		).map(cell => ({
-			id: cell.getAttribute("id"),
-			label: cell.getAttribute("value"),
-			parent: cell.getAttribute("parent"),
-			source: cell.getAttribute("source") || estimateClosestActivationBar(cell, lifelines, 'sourcePoint', allCells)['id'],
-			target: cell.getAttribute("target") || estimateClosestActivationBar(cell, lifelines, 'targetPoint', allCells)['id'],
-			dashed: cell.getAttribute("style").includes("dashed=1"), // true / false
-			fragment: "",
-			fragmentParent: "",
-			subFragment: ""
-		}));
+		).map(cell => {
+			const targetPointY = getAbsolutePositionOfLine(cell, getLineCoordinates(cell, 'targetPoint'), allCells).y;
+			return {
+				id: cell.getAttribute("id"),
+				label: cell.getAttribute("value"),
+				parent: cell.getAttribute("parent"),
+				source: cell.getAttribute("source") || estimateClosestActivationBar(cell, lifelines, 'sourcePoint', allCells)['id'],
+				target: cell.getAttribute("target") || estimateClosestActivationBar(cell, lifelines, 'targetPoint', allCells)['id'],
+				dashed: cell.getAttribute("style").includes("dashed=1"), // true / false
+				fragment: "",
+				fragmentParent: "",
+				subFragment: "",
+				y: targetPointY
+			};
+		});
+
+
+		const fragments = extractFragmentsAndLinesHierarchy(allCells, messages);
 
 		// Add fragment reference to message/arrow
 		messages.forEach(msg => {
