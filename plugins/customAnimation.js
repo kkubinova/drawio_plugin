@@ -475,19 +475,11 @@ Draw.loadPlugin(function(editorUi)
 				var reader = new FileReader();
 				reader.onload = function(evt) {
 					var text = evt.target.result;
-					// Always focus textarea before insertion
+					// Replace the entire textarea content with the uploaded animation
+					list.value = text.trim();
+					// Move cursor to the end
+					list.selectionStart = list.selectionEnd = list.value.length;
 					list.focus();
-					// Insert at cursor, or append if not focused
-					var start = list.selectionStart;
-					var end = list.selectionEnd;
-					var before = list.value.substring(0, start);
-					var after = list.value.substring(end);
-					// Add a newline before if not at start or after if not at end
-					var insertText = text;
-					if (before && !before.endsWith('\n')) insertText = '\n' + insertText;
-					if (after && !insertText.endsWith('\n')) insertText = insertText + '\n';
-					list.value = before + insertText + after;
-					list.selectionStart = list.selectionEnd = before.length + insertText.length;
 				};
 				reader.readAsText(file);
 			} else {
