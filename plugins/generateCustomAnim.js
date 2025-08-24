@@ -244,13 +244,13 @@ Draw.loadPlugin(function(editorUi)
 				'id': cell.id,
 				'value': cell.label,
 				'y': absPos['y'],
-				'height': cell.geometry.getAttribute('height'),
+				'height': parseFloat(cell.geometry.getAttribute('height')),
 				'child_areas': allCells.filter(ca => ca.parent == cell.id).map(ca => {
 					let childAreaMetadata = {
 						'id': ca.id,
 						'value': ca.label,
 						'y': getAbsolutePosition(ca, allCells)['y'],
-						'height': ca.geometry.getAttribute('height'),
+						'height': parseFloat(ca.geometry.getAttribute('height')),
 						'lines': []
 					};
 					return childAreaMetadata;
@@ -285,33 +285,25 @@ Draw.loadPlugin(function(editorUi)
 		});
 
 		messages.forEach(line => {
-			let assigned = false;
+			const lineY = line.y;
 			for(let i = fragments.length - 1; i >= 0; i--) {
 				const fragment = fragments[i];
-				for (let j = 0; j < fragment['child_areas'].length; j++) {
-					const ca = fragment['child_areas'][j];
-
-					// Special handling for 'alt' fragments based on message label
-					if (fragment.value === 'alt') {
-						if (line.label === 'allowed' && ca.value.includes('Eligible')) {
-							ca['lines'].push(line);
-							assigned = true;
-							break;
-						} else if (line.label === 'not allowed' && ca.value.includes('Not eligible')) {
-							ca['lines'].push(line);
-							assigned = true;
-							break;
-						}
-					} else {
-						// Existing logic for other fragment types or if no specific label match
-						if(line['y'] >= ca['y'] && line['y'] <= (ca['y'] + ca['height'])) {
-							ca['lines'].push(line);
-							assigned = true;
-							break;
+				const fragY = fragment.y;
+				const fragHeight = fragment.height;
+				if (lineY >= fragY && lineY <= (fragY + fragHeight)) {
+					const childAreas = fragment['child_areas'];
+					if (childAreas.length === 1) {
+						childAreas[0]['lines'].push(line);
+					} else if (childAreas.length === 2) {
+						const ca1 = childAreas[0];
+						const ca2 = childAreas[1];
+						const dividerY = ca2['y'];
+						if (lineY < dividerY) {
+							ca1['lines'].push(line);
+						} else {
+							ca2['lines'].push(line);
 						}
 					}
-				}
-				if (assigned) {
 					break;
 				}
 			}
@@ -595,17 +587,17 @@ Draw.loadPlugin(function(editorUi)
 		var flow = []; 
 		var visited = new Set();
 
-		// Collect all messages with valid sourcePoint, sort by sourcePoint.y (top to bottom)
+		// Collect all messages with valid sourcePoint and targetPoint, sort by y (top to bottom)
 		var sortedMessages = messages
-			.filter(msg => msg.sourcePoint)
+			.filter(msg => msg.sourcePoint && msg.targetPoint)
 			.sort((a, b) => {
-				return a.sourcePoint.y - b.sourcePoint.y
+				return a.y - b.y
 			});
 
 			
 		const fragmentMessages = new Map(); // key: fragmentId, value: Set of messageIds
 		const firstSubFragmentMap = new Map(); // key: fragmentId, value: firstSubFragmentId
-
+		
 		sortedMessages.forEach(msg => {
 			if (visited.has(msg.id)) return;
 
@@ -911,4 +903,3 @@ Draw.loadPlugin(function(editorUi)
 		editorUi.menus.addMenuItems(menu, ['-', '', 'generateCustomAnim'], parent);
 	};
 });
-
