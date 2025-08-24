@@ -812,7 +812,7 @@ Draw.loadPlugin(function(editorUi)
 			if (sourceLifeline.id && highlighted.has(sourceLifeline.id) && !hasHighlightedActivationBar(sourceLifeline.id)) { 	// UNhighlight lifeline bloku v SqD
 				unhighlight(sourceLifeline.id);
 			}
-			if (sourceLifeline.matchedClassId && !hasHighlightedMethod(sourceLifeline.matchedClassId)) { // UNhighlight triedy v CD ak nema ziadnu vysvietenu metodu
+			if (sourceLifeline.matchedClassId && !highlighted.has(sourceLifeline.id) && !hasHighlightedMethod(sourceLifeline.matchedClassId)) { // UNhighlight triedy v CD ak nesvieti lifeline blok a nema ziadnu vysvietenu metodu
 				unhighlight(sourceLifeline.matchedClassId);
 				if (sourceLifeline.matchedClassId && sourceLifeline.id) { 	// zmaze zltu sipku medzi triedou v CD a lifeline blokom v SqD
 					removeInterDiagramLink(sourceLifeline.matchedClassId, sourceLifeline.id);
@@ -828,6 +828,9 @@ Draw.loadPlugin(function(editorUi)
 			if (msg.fragment !== "" && highlighted.has(msg.fragment)) {
 				console.log(`has fragment ${msg.fragment}, pop msg.id ${msg.id}`)
 				console.log(fragmentMessages.get(msg.fragment))
+				if (matchingCall.id) {
+					fragmentMessages.get(msg.fragment).delete(matchingCall.id);
+				}
 				if (fragmentMessages.get(msg.fragment).delete(msg.id)) { 
 					console.log(fragmentMessages.get(msg.fragment))
 					if (fragmentMessages.get(msg.fragment).size === 0) {
