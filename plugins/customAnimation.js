@@ -586,9 +586,9 @@ Draw.loadPlugin(function(editorUi)
 			gap: 0.7rem;
 			margin-top: 0.5rem;
 		}
-		.custom-anim-actionbtn {
-			background: #0078d4;
-			color: #fff;
+		div.custom-anim-main .custom-anim-actionbtn {
+			background: #0078d4 !important;
+			color: #fff !important;
 			border: none;
 			border-radius: 5px;
 			padding: 0.5rem 1.2rem;
@@ -596,8 +596,8 @@ Draw.loadPlugin(function(editorUi)
 			cursor: pointer;
 			transition: background 0.2s;
 		}
-		.custom-anim-actionbtn:hover {
-			background: #005fa3;
+		div.custom-anim-main .custom-anim-actionbtn:hover {
+			background: #005fa3 !important;
 		}
 		.custom-anim-preview {
 			background: #fff;
