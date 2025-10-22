@@ -1,0 +1,65 @@
+animate I_AdbzGn9Q0q4DHOUhhW-24
+animate I_AdbzGn9Q0q4DHOUhhW-26
+wait 1500
+roll I_AdbzGn9Q0q4DHOUhhW-42
+wait 1500
+animate I_AdbzGn9Q0q4DHOUhhW-37
+animate I_AdbzGn9Q0q4DHOUhhW-38
+animate 79mV_z3nXGvTlv3c_QOG-8
+add 79mV_z3nXGvTlv3c_QOG-8 I_AdbzGn9Q0q4DHOUhhW-37
+wait 1500
+roll I_AdbzGn9Q0q4DHOUhhW-29
+animate 79mV_z3nXGvTlv3c_QOG-14
+add 79mV_z3nXGvTlv3c_QOG-14 I_AdbzGn9Q0q4DHOUhhW-29
+roll Qpx5vXlG_rgqYz1MTeB7-4
+wait 1500
+animate I_AdbzGn9Q0q4DHOUhhW-27
+animate I_AdbzGn9Q0q4DHOUhhW-28
+animate 79mV_z3nXGvTlv3c_QOG-17
+add 79mV_z3nXGvTlv3c_QOG-17 I_AdbzGn9Q0q4DHOUhhW-27
+wait 1500
+roll B0aL4fOi5VbnC7XkGEFS-109
+animate 79mV_z3nXGvTlv3c_QOG-40
+add 79mV_z3nXGvTlv3c_QOG-40 B0aL4fOi5VbnC7XkGEFS-109
+roll 79mV_z3nXGvTlv3c_QOG-16
+wait 1500
+animate B0aL4fOi5VbnC7XkGEFS-107
+animate B0aL4fOi5VbnC7XkGEFS-108
+animate 79mV_z3nXGvTlv3c_QOG-38
+add 79mV_z3nXGvTlv3c_QOG-38 B0aL4fOi5VbnC7XkGEFS-107
+wait 1500
+roll B0aL4fOi5VbnC7XkGEFS-110
+wait 1500
+hide 79mV_z3nXGvTlv3c_QOG-40
+hide B0aL4fOi5VbnC7XkGEFS-109
+remove 79mV_z3nXGvTlv3c_QOG-40 B0aL4fOi5VbnC7XkGEFS-109
+hide B0aL4fOi5VbnC7XkGEFS-108
+hide B0aL4fOi5VbnC7XkGEFS-107
+hide 79mV_z3nXGvTlv3c_QOG-38
+remove 79mV_z3nXGvTlv3c_QOG-38 B0aL4fOi5VbnC7XkGEFS-107
+hide 79mV_z3nXGvTlv3c_QOG-16
+hide B0aL4fOi5VbnC7XkGEFS-110
+wait 1500
+roll I_AdbzGn9Q0q4DHOUhhW-32
+wait 1500
+hide 79mV_z3nXGvTlv3c_QOG-14
+hide I_AdbzGn9Q0q4DHOUhhW-29
+remove 79mV_z3nXGvTlv3c_QOG-14 I_AdbzGn9Q0q4DHOUhhW-29
+hide I_AdbzGn9Q0q4DHOUhhW-28
+hide I_AdbzGn9Q0q4DHOUhhW-27
+hide 79mV_z3nXGvTlv3c_QOG-17
+remove 79mV_z3nXGvTlv3c_QOG-17 I_AdbzGn9Q0q4DHOUhhW-27
+hide Qpx5vXlG_rgqYz1MTeB7-4
+hide I_AdbzGn9Q0q4DHOUhhW-32
+wait 1500
+roll I_AdbzGn9Q0q4DHOUhhW-40
+wait 1500
+hide I_AdbzGn9Q0q4DHOUhhW-42
+hide I_AdbzGn9Q0q4DHOUhhW-38
+hide I_AdbzGn9Q0q4DHOUhhW-37
+hide 79mV_z3nXGvTlv3c_QOG-8
+remove 79mV_z3nXGvTlv3c_QOG-8 I_AdbzGn9Q0q4DHOUhhW-37
+hide I_AdbzGn9Q0q4DHOUhhW-40
+wait 1500
+hide I_AdbzGn9Q0q4DHOUhhW-24
+hide I_AdbzGn9Q0q4DHOUhhW-26
