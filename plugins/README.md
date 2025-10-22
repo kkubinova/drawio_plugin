@@ -136,7 +136,7 @@ CLASS_DIAGRAM_LAYER = "CD"                       // Class diagram layer name
 
 
 
-## File Structure
+## Folder Structure
 
 ```
 plugins/
