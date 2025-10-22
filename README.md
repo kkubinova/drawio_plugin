@@ -27,7 +27,14 @@ To use this plugin in Draw.io:
         drawio --enable-plugins diagrams/diagrams_animated.drawio
         ```
 
-3.  **Refresh Draw.io**:
+3.  **Ubuntu Specific Workaround**:
+    *   On Ubuntu, you might encounter an issue where the plugins are not loaded correctly after closing and reopening Draw.io. If this happens, you may need to manually remove the plugin files from the Draw.io configuration directory before reloading them.
+        ```bash
+        rm ~/.config/draw.io/plugins/customAnimation.js ~/.config/draw.io/plugins/generateCustomAnim.js
+        ```
+        After removing, reload the plugins in Draw.io.
+        
+4.  **Refresh Draw.io**:
     *   After configuring the plugins, refresh Draw.io to ensure the plugins are loaded and active.
 
 After installation, you will find new options under the `Extras` menu:
