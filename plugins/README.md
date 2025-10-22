@@ -13,7 +13,7 @@ These plugins enable interactive animations for UML sequence and class diagrams,
 **Purpose**: Provides a UI for creating, editing, and previewing custom animations manually.
 
 **Key Features**:
-- **Animation Editor Window**: Opens via `Extras > Custom Animation...` menu
+- **Animation Editor Window**: Opens via `Extras` > `Custom Animation...` menu
 - **Live Preview**: Real-time preview pane showing animation execution
 - **Command Buttons**: Quick-insert buttons for common animation commands
 - **File Upload**: Load animation scripts from `.txt` files
@@ -34,7 +34,7 @@ These plugins enable interactive animations for UML sequence and class diagrams,
 
 **Usage**:
 1. Open draw.io diagram
-2. Select `Extras > Custom Animation...`
+2. Select `Extras` > `Custom Animation...`
 3. Select cells and click command buttons to insert animation steps
 4. Click `Preview` to test animation
 6. Optionally upload pre-written animation scripts from `.txt` file
@@ -78,7 +78,7 @@ These plugins enable interactive animations for UML sequence and class diagrams,
 **Usage**:
 1. Create sequence diagram with lifelines and messages in `SqD` layer
 2. Create class diagram with matching class names in `CD`
-3. Select `Extras > Generate Custom Animation...`
+3. Select `Extras` > `Generate Custom Animation...`
 4. Animation script downloads as `animation.txt`
 5. Upload to Custom Animation window for playback
 
