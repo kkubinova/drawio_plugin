@@ -82,7 +82,7 @@ On Ubuntu, you might encounter an issue where the plugins are not loaded correct
 ```bash
 rm ~/.config/draw.io/plugins/customAnimation.js ~/.config/draw.io/plugins/generateCustomAnim.js
 ```
-After removing, reload the plugins in draw.io as described in the Installation section (step 3).
+After removing, reload the plugins in draw.io as described in the Quick Start section (step 3).
 
 ### Plugin Not Appearing
 If the plugin doesn't appear in the `Extras` menu:
