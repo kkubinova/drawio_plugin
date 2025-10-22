@@ -14,7 +14,7 @@ This folder contains example draw.io diagrams demonstrating the custom animation
 
 **Animation Script**: [`examples/simple_animation.txt`](examples/simple_animation.txt)
 
-**Preview Video**: [`examples/simple_preview.webm`](examples/simple_preview.webm)
+**Preview Video**: [`examples/simple_preview.mp4`](examples/simple_preview.mp4)
 
 ### [`examples/more_complex.drawio`](examples/more_complex.drawio)
 **Description**: Complex multi-class interaction example with multiple lifelines and method calls.
