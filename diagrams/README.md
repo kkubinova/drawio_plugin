@@ -54,10 +54,6 @@ Contains additional fragment-specific examples.
    - Upload the animation script or paste it into the text area
    - Click `Preview` to watch the animation
 
-5. **View in Chromeless Mode**:
-   - Open the diagram with `?lightbox=1` parameter
-   - Animation plays automatically in loop
-
 ## Diagram Structure
 
 All example diagrams follow this structure:
