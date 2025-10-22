@@ -16,6 +16,9 @@ This folder contains example draw.io diagrams demonstrating the custom animation
 
 **Preview Video**: [`examples/simple_preview.mp4`](examples/simple_preview.mp4)
 
+https://github.com/user-attachments/assets/4f5ea0e5-6f6a-4f83-b0b7-4cd313060337
+
+
 ### [`examples/more_complex.drawio`](examples/more_complex.drawio)
 **Description**: Complex multi-class interaction example with multiple lifelines and method calls.
 
