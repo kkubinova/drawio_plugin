@@ -1,10 +1,21 @@
 /**
- * vytvori animaciu pre class a sekvencny diagram, animuje aj sipky medzi classami 
+ * Creates animation for class and sequence diagrams, animates arrows between classes
  */
 Draw.loadPlugin(function(editorUi)
 {
-	// Adds resource for action
+	// Constants
+	const FRAGMENT_TYPES = ['alt', 'opt', 'loop', 'par'];
+	const DEFAULT_WAIT_TIME = 1500;
+	const PROXIMITY_PADDING = 10;
+	const SEQUENCE_DIAGRAM_LAYER = "SqD";
+	const CLASS_DIAGRAM_LAYER = "CD";
+	
+	// Register menu resource
 	mxResources.parse('generateCustomAnim=Generate Custom Animation...');
+
+	// ============================================================================
+	// MAIN ANIMATION GENERATION
+	// ============================================================================
 
 	function generateAnimation() {
 		const { xmlDoc, sqdCells, cdCells, allCells } = parseDiagramXml(editorUi);
@@ -17,6 +28,10 @@ Draw.loadPlugin(function(editorUi)
 		return animationScript;
 	}
 
+	// ============================================================================
+	// XML PARSING AND DIAGRAM EXTRACTION
+	// ============================================================================
+
 	function parseDiagramXml(editorUi) {
 		var xml = editorUi.getFileData();
 		var parser = new DOMParser();
@@ -26,8 +41,8 @@ Draw.loadPlugin(function(editorUi)
 
 		var allCells = Array.from(xmlDoc.getElementsByTagName("mxCell"));
 
-		const sqdCells = getDiagramCells(allCells, "SqD")   // SqD - name of layer for sequence diagram
-		const cdCells  = getDiagramCells(allCells, "CD");   //  CD - name of layer for class diagram
+		const sqdCells = getDiagramCells(allCells, SEQUENCE_DIAGRAM_LAYER);
+		const cdCells = getDiagramCells(allCells, CLASS_DIAGRAM_LAYER);
 
 		allCells = allCells.map(cell => {
 			return {
@@ -35,14 +50,18 @@ Draw.loadPlugin(function(editorUi)
 				raw: cell,
 				label: cell.getAttribute("value"),
 				parent: cell.getAttribute("parent"),
-				is_edge: cell.getAttribute('edge') == '1',
-				is_vertex: cell.getAttribute('vertex') == '1',
+				is_edge: cell.getAttribute('edge') === '1',
+				is_vertex: cell.getAttribute('vertex') === '1',
 				geometry: cell.getElementsByTagName("mxGeometry")[0],
 			};
 		});
 
 		return { xmlDoc, sqdCells, cdCells, allCells };
 	}
+
+	// ============================================================================
+	// GEOMETRY AND POSITION UTILITIES
+	// ============================================================================
 
 	function getClosestLifeline(activationBar, lifelines, allCells) {
 		let abCoordinates = {
@@ -78,21 +97,20 @@ Draw.loadPlugin(function(editorUi)
 			return lfCoordinates;
 		});
 
-		lifelinesCoordinates.sort((a,b) => {
-			let aDist = distanceOfLinePointAndActivationBar(abMiddlePoint, a);
-			let bDist = distanceOfLinePointAndActivationBar(abMiddlePoint, b);
-
-			if (aDist < bDist) { return -1; }
-			else if (aDist > bDist) { return 1; }
-
-			return 0;
+		lifelinesCoordinates.sort((a, b) => {
+			const aDist = distanceOfLinePointAndActivationBar(abMiddlePoint, a);
+			const bDist = distanceOfLinePointAndActivationBar(abMiddlePoint, b);
+			return aDist - bDist;
 		});
 
 		return lifelinesCoordinates[0];
 	}
 
-	// Helper to extract lifeline with its activation bars
-	function extractLifelines(sqdCells, allCells) {			
+	// ============================================================================
+	// LIFELINE EXTRACTION
+	// ============================================================================
+
+	function extractLifelines(sqdCells, allCells) {
 		var lifelines = sqdCells.filter(cell =>
 			cell.getAttribute("style") && cell.getAttribute("style").includes("shape=umlLifeline")
 		).map(cell => {
@@ -142,7 +160,7 @@ Draw.loadPlugin(function(editorUi)
 			});
 
 			lifelines.forEach(lf => {
-				lf.activationBars = activationBars.filter(ab => ab.lifeline == lf.id)
+				lf.activationBars = activationBars.filter(ab => ab.lifeline === lf.id);
 			});
 
 		return lifelines;
@@ -159,7 +177,7 @@ Draw.loadPlugin(function(editorUi)
 				y += parseFloat(geoElem.getAttribute("y")) || 0;
 			}
 			const parentId = current.parent;
-			if (!parentId || parentId == '0') break;
+			if (!parentId || parentId === '0') break;
 			current = diagramCells.find(c => c.id === parentId);
 		}
 
@@ -227,17 +245,22 @@ Draw.loadPlugin(function(editorUi)
 		return closestActivationBar;
 	}
 
+	// ============================================================================
+	// FRAGMENT EXTRACTION
+	// ============================================================================
+
 	function getLineCoordinates(cell, coordinateName) {
-		let a = cell.getElementsByTagName('mxGeometry')[0];
-		let b = a.getElementsByTagName('mxPoint');
-		let coordinateCell = Array.from(b).filter(el => el.getAttribute("as") == coordinateName)[0];
-		let result = { 'x': coordinateCell.getAttribute('x'), 'y': coordinateCell.getAttribute('y') };
-		return result;
+		const geometry = cell.getElementsByTagName('mxGeometry')[0];
+		const points = geometry.getElementsByTagName('mxPoint');
+		const coordinateCell = Array.from(points).find(el => el.getAttribute("as") === coordinateName);
+		return {
+			x: coordinateCell.getAttribute('x'),
+			y: coordinateCell.getAttribute('y')
+		};
 	}
 	
-	const fragTypes = ['alt', 'opt', 'loop', 'par'];
 	function extractFragmentsAndLinesHierarchy(allCells, messages) {
-		let fragCells = allCells.filter(cell => fragTypes.includes(cell.label));
+		const fragCells = allCells.filter(cell => FRAGMENT_TYPES.includes(cell.label));
 		let fragments = fragCells.map(cell => {
 			let absPos = getAbsolutePosition(cell, allCells);
 			let fragment = {
@@ -245,7 +268,7 @@ Draw.loadPlugin(function(editorUi)
 				'value': cell.label,
 				'y': absPos['y'],
 				'height': parseFloat(cell.geometry.getAttribute('height')),
-				'child_areas': allCells.filter(ca => ca.parent == cell.id).map(ca => {
+				'child_areas': allCells.filter(ca => ca.parent === cell.id).map(ca => {
 					let childAreaMetadata = {
 						'id': ca.id,
 						'value': ca.label,
@@ -265,24 +288,8 @@ Draw.loadPlugin(function(editorUi)
 			frag['parent'] = allChildAreaIds.includes(frag['parent']) ? frag['parent'] : null;
 		});
 
-		fragments.sort((a,b) => {
-			if (a.y < b.y) {
-				return -1;
-			} else if (a > b) {
-				return 1;
-			}
-			// a must be equal to b
-			return 0;
-		});
-
-		messages.sort((a,b) => {
-			if (a.y < b.y) {
-				return -1;
-			} else if (a.y > b.y) {
-				return 1;
-			}
-			return 0;
-		});
+		fragments.sort((a, b) => a.y - b.y);
+		messages.sort((a, b) => a.y - b.y);
 
 		messages.forEach(line => {
 			const lineY = line.y;
@@ -311,6 +318,10 @@ Draw.loadPlugin(function(editorUi)
 
 		return fragments;
 	}
+
+	// ============================================================================
+	// SEQUENCE DIAGRAM PARSING
+	// ============================================================================
 
 	function parseSequenceDiagram(sqdCells, cdCells, allCells) {
 		// Extract lifelines from sqdCells
@@ -409,9 +420,13 @@ Draw.loadPlugin(function(editorUi)
 		return [lifelines, messages, fragments];
 	}
 
+	// ============================================================================
+	// CLASS DIAGRAM PARSING
+	// ============================================================================
+
 	function parseClassDiagram(sqdCells, cdCells) {
 		// Find the CD layer id (parent for all class elements)
-		const cdLayer = cdCells.find(cell => cell.getAttribute("value") === "CD");
+		const cdLayer = cdCells.find(cell => cell.getAttribute("value") === CLASS_DIAGRAM_LAYER);
 		const cdLayerId = cdLayer ? cdLayer.getAttribute("id") : null;
 		if (!cdLayerId) return;
 
@@ -439,7 +454,7 @@ Draw.loadPlugin(function(editorUi)
 		console.log(classes);
 
 		// Helper to check if a point is inside a class with optional padding
-		function pointInClass(point, classRect, padding = 10) {
+		function pointInClass(point, classRect, padding = PROXIMITY_PADDING) {
 			return point.x >= classRect.x - padding &&
 				point.x <= classRect.x + classRect.width + padding &&
 				point.y >= classRect.y - padding &&
@@ -557,7 +572,10 @@ Draw.loadPlugin(function(editorUi)
 		});
 	}
 
-	// Build the animation script for the animation.js plugin
+	// ============================================================================
+	// ANIMATION SCRIPT BUILDING
+	// ============================================================================
+
 	function buildAnimationScript(lifelines, messages, cdClasses, cdRelations, cdCells, allCells) {
 		// Build a map from source to messages for quick traversal
 		var sourceMap = new Map();
@@ -660,36 +678,34 @@ Draw.loadPlugin(function(editorUi)
 		function findMatchingCall(msg, allCells) {
 			if (!msg.source || !msg.target) return null;
 
-			var rawMsg = allCells.filter(c => c.id == msg.id)[0].raw;
+			const rawMsg = allCells.find(c => c.id === msg.id).raw;
 			const returnLine = {
 				id: msg.id,
 				y: getAbsolutePositionOfLine(rawMsg, getLineCoordinates(rawMsg, "targetPoint"), allCells).y
 			};
 
-			const reversed
-				= calls.filter(call =>
-					call.source === msg.target &&
-					call.target === msg.source
-				).map(call => {
-					var rawCall = allCells.filter(c => c.id == call.id)[0].raw;
+			const reversed = calls
+				.filter(call => call.source === msg.target && call.target === msg.source)
+				.map(call => {
+					const rawCall = allCells.find(c => c.id === call.id).raw;
 					return {
 						id: call.id,
 						y: getAbsolutePositionOfLine(rawCall, getLineCoordinates(rawCall, "targetPoint"), allCells).y
-					}
+					};
 				});
-			if (reversed.length <= 0) { return null; }
+			if (reversed.length === 0) return null;
 
 			const above = reversed.filter(call => call.y < returnLine.y);
-			if (above.length <= 0) { return null; }
+			if (above.length === 0) return null;
 
-			above.sort((a,b) => a.y-b.y);
+			above.sort((a, b) => a.y - b.y);
 
-			var matchingCallId = above[above.length-1].id;
-			var matchingCall = calls.filter(call => call.id == matchingCallId)[0];
+			const matchingCallId = above[above.length - 1].id;
+			const matchingCall = calls.find(call => call.id === matchingCallId);
 			return matchingCall;
 		}
 
-		// Animation helpers
+		// Animation command helpers
 		function highlightCell(id) {
 			animationScript += `animate ${id}\n`;
 			highlighted.add(id);
@@ -702,7 +718,7 @@ Draw.loadPlugin(function(editorUi)
 			animationScript += `hide ${id}\n`;
 			highlighted.delete(id);
 		}
-		function wait(ms = 1500) {
+		function wait(ms = DEFAULT_WAIT_TIME) {
 			animationScript += `wait ${ms}\n`;
 		}
 		function addInterDiagramLink(sourceId, targetId) {
@@ -732,8 +748,7 @@ Draw.loadPlugin(function(editorUi)
 		}
 		wait();
 
-		console.log("fragmentMessages")
-		console.log(fragmentMessages)
+		console.log(`fragmentMessages: ${fragmentMessages}`)
 
 		flow.forEach((msg) => {
 			const sourceLifeline = findLifelineByBarId(msg.source);
@@ -749,14 +764,13 @@ Draw.loadPlugin(function(editorUi)
 			}
 		});
 
-		// Animate a fragment
+		// Animation step functions
 		function animateFragment(fragment) {
 			if (!highlighted.has(fragment)) {
 				highlightCell(fragment);
 			}			
 		}
 
-		// Animate a call
 		function animateCall(msg, sourceLifeline, targetLifeline) {
 			if (!highlighted.has(msg.id)) { 									// highlight sipky v SqD
 				highlightArrow(msg.id);
@@ -790,7 +804,6 @@ Draw.loadPlugin(function(editorUi)
 			wait();
 		}
 
-		// Animate a return step
 		function animateReturn(msg, sourceLifeline, targetLifeline, allCells) {
 			const matchingCall = findMatchingCall(msg, allCells);
 			if (!highlighted.has(msg.id)) { 								// highlight return sipky v SqD
@@ -856,34 +869,26 @@ Draw.loadPlugin(function(editorUi)
 
 		// Helper: Check if a class has any highlighted elements inside
 		function hasHighlightedMethod(classId) {
-			const cdClass = cdClasses.filter(c => c.id === classId)[0];
-			for (const method of cdClass.children) {
-				if (highlighted.has(method)) {
-					return true;
-				}
-			}
-			return false;
+			const cdClass = cdClasses.find(c => c.id === classId);
+			return cdClass?.children.some(method => highlighted.has(method)) || false;
 		}
 
 		// Helper: Check if a lifeline has any highlighted activation bars
 		function hasHighlightedActivationBar(lifelineId) {
-			const lifeline = lifelines.filter(l => l.id === lifelineId)[0];
-			for (const activationBar of lifeline.activationBars) {
-				if (highlighted.has(activationBar.id)) {
-					return true;
-				}
-			}
-			return false;
+			const lifeline = lifelines.find(l => l.id === lifelineId);
+			return lifeline?.activationBars.some(ab => highlighted.has(ab.id)) || false;
 		}
 
 		function findRelationBetweenClasses(sourceId, targetId) {
-			if (!sourceId || !targetId) {
-				return;
-			}
+			if (!sourceId || !targetId) return null;
 			return cdRelations.find(r => r.source === sourceId && r.target === targetId);
-			// TODO hladat ked tak aj opacne
+			// TODO: Search in reverse direction if needed
 		}
 	}
+
+	// ============================================================================
+	// PLUGIN REGISTRATION
+	// ============================================================================
 
 	editorUi.actions.addAction('generateCustomAnim', function() {
 		const animation = generateAnimation();
@@ -901,7 +906,7 @@ Draw.loadPlugin(function(editorUi)
 	var menu = editorUi.menus.get('extras');
 	var oldFunct = menu.funct;
 
-	menu.funct = function(menu, parent){
+	menu.funct = function(menu, parent) {
 		oldFunct.apply(this, arguments);
 		editorUi.menus.addMenuItems(menu, ['-', '', 'generateCustomAnim'], parent);
 	};
