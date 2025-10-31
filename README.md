@@ -1,7 +1,25 @@
 # draw.io - Custom Animation Plugin
+
 This project provides a draw.io plugin that enables custom animations for diagrams, focusing on enhancing the visualization of Sequence Diagrams and their interaction with Class Diagrams. Users can define a sequence of animation steps to highlight elements, animate message flows, and dynamically show relationships between different diagram types.
 
-## Features
+---
+
+## 📑 Table of Contents
+
+- [Features](#-features)
+- [Prerequisites](#-prerequisites)
+- [Quick Start](#-quick-start)
+- [Usage](#-usage)
+  - [Custom Animation Window](#custom-animation-window)
+  - [Generating Animations](#generating-animations)
+  - [Animation Commands](#animation-commands)
+- [Troubleshooting](#-troubleshooting)
+- [Supported Diagram Types](#-supported-diagram-types)
+- [Project Structure](#-project-structure)
+
+---
+
+## ✨ Features
 - **Custom Animation Playback**: Play predefined animation scripts directly within Draw.io.
 - **Interactive Animation Window**: A dedicated window to input, preview, and manage animation scripts.
 - **Animation Script Generation**: Automatically generate animation scripts from existing Sequence and Class Diagrams.
@@ -11,7 +29,7 @@ This project provides a draw.io plugin that enables custom animations for diagra
 - **Fragment Support**: Recognizes and animates `alt`, `opt`, `loop`, and `par` fragments in Sequence Diagrams.
 - **File Upload**: Load animation scripts from `.txt` files.
 
-## Prerequisites
+## 📋 Prerequisites
 To use this plugin, you need to have the **draw.io Desktop application installed**.
 
 You can download the latest version of draw.io Desktop from the official GitHub releases page:
@@ -19,12 +37,26 @@ You can download the latest version of draw.io Desktop from the official GitHub 
 
 Choose the appropriate installer for your operating system (e.g., `.deb` for Debian/Ubuntu, `.exe` for Windows, `.dmg` for macOS).
 
-## Quick Start
+## 🚀 Quick Start
+
 To use this plugin in draw.io desktop, follow these steps:
 
-1.  **Clone the repository**
+### 1. Clone the repository
 
-2.  **Run draw.io with plugin support**:
+### 2. Run draw.io with plugin support
+- **Windows Instructions**
+    *   Open Command Prompt or PowerShell and navigate to the cloned repository directory. Then run draw.io using one of the following commands:
+        ```bash
+        "C:\Program Files\draw.io\draw.io.exe" --enable-plugins
+        # Or to instantly open a diagram with plugins enabled:
+        "C:\Program Files\draw.io\draw.io.exe" --enable-plugins diagrams\diagrams_animated.drawio
+        ```
+    *   **Note**: The exact path may vary depending on your installation. Common paths include:
+        - `C:\Program Files\draw.io\draw.io.exe`
+        - `C:\Program Files (x86)\draw.io\draw.io.exe`
+        - `%LOCALAPPDATA%\Programs\draw.io\draw.io.exe`
+
+- **Ubuntu/Linux Instructions**
     *   Open your terminal and navigate to the cloned repository directory. Then run draw.io using one of the following commands:
         ```bash
         drawio --enable-plugins
@@ -32,19 +64,25 @@ To use this plugin in draw.io desktop, follow these steps:
         drawio --enable-plugins diagrams/diagrams_animated.drawio
         ```
 
-3.  **Load Plugins in draw.io**:
-    *   In draw.io, go to `Extras` > `Plugins...`.
-    *   Click "Add" and navigate to the `plugins/` directory in your cloned repository.
-    *   Select `customAnimation.js` and `generateCustomAnim.js` to load them.
+### 3. Load Plugins in draw.io
 
-4.  **Refresh draw.io**:
-    *   After configuring the plugins, refresh draw.io (by closing and reopening the application by a command in setp 2) to ensure the plugins are loaded and active.
+1. In draw.io, go to **`Extras`** > **`Plugins...`**
+2. Click **"Add"** and navigate to the `plugins/` directory in your cloned repository
+3. Select `customAnimation.js` and `generateCustomAnim.js` to load them
 
-After installation, you will find new options under the `Extras` menu:
--   `Custom Animation...`: Opens the custom animation playback window.
--   `Generate Custom Animation...`: Generates an animation script based on the current diagram.
+### 4. Refresh draw.io
 
-## Usage
+After configuring the plugins, refresh draw.io (by closing and reopening the application using the command in step 2) to ensure the plugins are loaded and active.
+
+### ✅ Verify Installation
+
+After installation, you will find new options under the **`Extras`** menu:
+- **`Custom Animation...`**: Opens the custom animation playback window
+- **`Generate Custom Animation...`**: Generates an animation script based on the current diagram
+
+---
+
+## 📖 Usage
 
 ### Custom Animation Window
 1.  Go to `Extras` > `Custom Animation...` to open the animation control panel.
@@ -75,30 +113,57 @@ The animation script uses a simple command-line syntax:
 -   `add [SOURCE_ID] [TARGET_ID]`: Adds an arrow between two cells (e.g., between a method in CD and a message in SqD).
 -   `remove [SOURCE_ID] [TARGET_ID]`: Removes a previously added arrow.
 
-## Troubleshooting
+---
 
-### Ubuntu Plugin Loading Issue
-On Ubuntu, you might encounter an issue where the plugins are not loaded correctly after closing and reopening draw.io. If this happens, you may need to manually remove the plugin files from the Draw.io configuration directory before reloading them:
-```bash
-rm ~/.config/draw.io/plugins/customAnimation.js ~/.config/draw.io/plugins/generateCustomAnim.js
+## 🔧 Troubleshooting
+
+### 🔄 Plugin Loading Issue
+
+If the plugins are not loaded correctly after closing and reopening draw.io, you may need to manually remove the plugin files from the Draw.io configuration directory before reloading them:
+
+<details>
+<summary><b>🪟 Windows</b></summary>
+
+```cmd
+del "C:\Users\<Your Username>\AppData\Roaming\draw.io\plugins\customAnimation.js"
+del "C:\Users\<Your Username>\AppData\Roaming\draw.io\plugins\generateCustomAnim.js"
 ```
-After removing, reload the plugins in draw.io as described in the Quick Start section (step 3).
 
-### Plugin Not Appearing
+</details>
+
+<details>
+<summary><b>🐧 Ubuntu/Linux</b></summary>
+
+```bash
+rm ~/.config/draw.io/plugins/customAnimation.js
+rm ~/.config/draw.io/plugins/generateCustomAnim.js
+```
+
+</details>
+
+After removing, reload the plugins in draw.io as described in the [Quick Start](#-quick-start) section (step 3).
+
+### ❌ Plugin Not Appearing
 If the plugin doesn't appear in the `Extras` menu:
- - Verify that the plugin files are in the correct path
+ - Verify that the plugin files are correctly loaded with the correct path
  - Ensure draw.io was launched with the `--enable-plugins` flag
  - Check file permissions on the plugin files (they should be readable)
  - Try restarting draw.io completely
 
-### Inspecting Logs
-If you encounter unexpected behavior, open the application's developer tools to check for errors, go to `Help` > `Open Developer Tools`.
+### 🔍 Inspecting Logs
 
-## Supported Diagram Types
+If you encounter unexpected behavior, open the application's developer tools to check for errors:
+- Go to **`Help`** > **`Open Developer Tools`**
+
+---
+
+## 📊 Supported Diagram Types
 -   **Sequence Diagrams**: Lifelines, messages (calls and returns), activation bars, and fragments (alt, opt, loop, par).
 -   **Class Diagrams**: Classes, methods, and relations between classes.
 
-## Project Structure
+---
+
+## 📁 Project Structure
 -   `plugins/customAnimation.js`: Handles the UI and playback logic for custom animations.
 -   `plugins/generateCustomAnim.js`: Contains the logic for parsing draw.io XML and generating animation scripts.
 -   `diagrams/`: Contains example draw.io diagrams.

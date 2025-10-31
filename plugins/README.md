@@ -2,17 +2,37 @@
 
 This folder contains two complementary plugins for creating and managing custom animations in draw.io diagrams.
 
-## Overview
+---
+
+## 📑 Table of Contents
+
+- [Overview](#-overview)
+- [Plugins](#-plugins)
+  - [customAnimation.js](#1-customanimationjs)
+  - [generateCustomAnim.js](#2-generatecustomanimjs)
+- [Animation Script Format](#-animation-script-format)
+- [Workflow Example](#-workflow-example)
+- [Configuration Constants](#-configuration-constants)
+- [Folder Structure](#-folder-structure)
+- [Development Notes](#-development-notes)
+
+---
+
+## 🎯 Overview
 
 These plugins enable interactive animations for UML sequence and class diagrams, allowing you to visualize execution flow and relationships between diagram elements.
 
-## Plugins
+---
 
-### 1. customAnimation.js
+## 🔧 Plugins
+
+### 1. [`customAnimation.js`](customAnimation.js)
 
 **Purpose**: Provides a UI for creating, editing, and previewing custom animations manually.
 
-**Key Features**:
+<details>
+<summary><b>📋 Key Features</b></summary>
+
 - **Animation Editor Window**: Opens via `Extras` > `Custom Animation...` menu
 - **Live Preview**: Real-time preview pane showing animation execution
 - **Command Buttons**: Quick-insert buttons for common animation commands
@@ -26,33 +46,48 @@ These plugins enable interactive animations for UML sequence and class diagrams,
   - `add SOURCE TARGET` - Create yellow arrow between diagrams
   - `remove SOURCE TARGET` - Remove yellow arrow between diagrams
 
-**Technical Details**:
+</details>
+
+<details>
+<summary><b>⚙️ Technical Details</b></summary>
+
 - Stores animation scripts in diagram's root cell attribute `customAnimation`
 - Auto-starts animations in chromeless view mode
 - Supports smooth color transitions using `requestAnimationFrame`
 - Provides interactive preview with panning and zoom controls
 
-**Usage**:
+</details>
+
+<details>
+<summary><b>📖 Usage</b></summary>
+
 1. Open draw.io diagram
 2. Select `Extras` > `Custom Animation...`
 3. Select cells and click command buttons to insert animation steps
 4. Click `Preview` to test animation
-6. Optionally upload pre-written animation scripts from `.txt` file
+5. Optionally upload pre-written animation scripts from `.txt` file
+
+</details>
 
 ---
 
-### 2. generateCustomAnim.js
+### 2. [`generateCustomAnim.js`](generateCustomAnim.js)
 
 **Purpose**: Automatically generates animation scripts from UML sequence and class diagrams.
 
-**Key Features**:
+<details>
+<summary><b>📋 Key Features</b></summary>
+
 - **Automatic Script Generation**: Analyzes diagram structure and creates animation sequences
 - **Dual-Diagram Support**: Coordinates animations between sequence diagrams (SqD) and class diagrams (CD)
 - **Fragment Support**: Handles UML fragments (`alt`, `opt`, `loop`, `par`)
 - **Smart Matching**: Links lifelines to classes and messages to methods by label matching
 - **Export**: Downloads generated animation as `animation.txt`
 
-**Technical Details**:
+</details>
+
+<details>
+<summary><b>⚙️ Technical Details</b></summary>
 
 **Diagram Parsing**:
 - Extracts elements from two layers: `SqD` (Sequence Diagram) and `CD` (Class Diagram)
@@ -75,15 +110,23 @@ These plugins enable interactive animations for UML sequence and class diagrams,
 - **Activation Bar ↔ Lifeline**: Uses proximity detection with configurable padding
 - **Arrow Endpoints ↔ Classes**: Proximity-based matching when explicit connections missing
 
-**Usage**:
+</details>
+
+<details>
+<summary><b>📖 Usage</b></summary>
+
 1. Create sequence diagram with lifelines and messages in `SqD` layer
-2. Create class diagram with matching class names in `CD`
+2. Create class diagram with matching class names in `CD` layer
 3. Select `Extras` > `Generate Custom Animation...`
 4. Animation script downloads as `animation.txt`
 5. Upload to Custom Animation window for playback
 
+</details>
 
-## Animation Script Format
+
+---
+
+## 📝 Animation Script Format
 
 Animation scripts are plain text files with one command per line:
 
@@ -101,7 +144,9 @@ remove sourceId targetId # Remove yellow arrow
 **Cell IDs**: Use the internal draw.io cell IDs (visible in XML or via selection)
 
 
-## Workflow Example
+---
+
+## 🔄 Workflow Example
 
 1. **Design Diagrams**:
    - Create sequence diagram in `SqD` layer
@@ -122,7 +167,9 @@ remove sourceId targetId # Remove yellow arrow
    - Click `Preview` to test
 
 
-## Configuration Constants
+---
+
+## ⚙️ Configuration Constants
 
 ### generateCustomAnim.js
 
@@ -136,7 +183,9 @@ CLASS_DIAGRAM_LAYER = "CD"                       // Class diagram layer name
 
 
 
-## Folder Structure
+---
+
+## 📁 Folder Structure
 
 ```
 plugins/
@@ -146,7 +195,9 @@ plugins/
 ```
 
 
-## Development Notes
+---
+
+## 💻 Development Notes
 
 Both plugins extend draw.io using the [`Draw.loadPlugin()`](customAnimation.js:4) API and integrate with the `Extras` menu. They share animation command syntax but serve different purposes:
 
