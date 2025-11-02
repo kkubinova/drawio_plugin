@@ -47,15 +47,31 @@ To use this plugin in draw.io desktop, follow these steps:
 - **Windows Instructions**
     *   Open Command Prompt or PowerShell and navigate to the cloned repository directory. Then run draw.io using one of the following commands:
         ```bash
-        "C:\Program Files\draw.io\draw.io.exe" --enable-plugins
+        & "C:\Program Files\draw.io\draw.io.exe" --enable-plugins
         # Or to instantly open a diagram with plugins enabled:
-        "C:\Program Files\draw.io\draw.io.exe" --enable-plugins diagrams\diagrams_animated.drawio
-        ```
+        & "C:\Program Files\draw.io\draw.io.exe" --enable-plugins diagrams\diagrams_animated.drawio
+        ```     
+    *  💡 **Tip**: To make `draw.io` available as a command from anywhere in the terminal add draw.io to the System PATH:
+        1. Press **Win + R**, type `sysdm.cpl`, and press **Enter**.
+        2. In **System Properties**, go to the **Advanced** tab → click **Environment Variables…**
+        3. Under **System variables**, find and select **Path** → click **Edit** → **New**.
+        4. Add the folder path where `draw.io.exe` is installed, for example:
+            ```
+            C:\Program Files\draw.io
+            ```
+        5. Click **OK** on all dialogs to save and apply changes.
+        6. Open a **new** Command Prompt or PowerShell window (so the updated PATH loads) and run:
+            ```bash
+            draw.io --enable-plugins
+            # Or to instantly open a diagram with plugins enabled:
+            draw.io --enable-plugins diagrams\diagrams_animated.drawio
+            ```    
+        
     *   **Note**: The exact path may vary depending on your installation. Common paths include:
         - `C:\Program Files\draw.io\draw.io.exe`
         - `C:\Program Files (x86)\draw.io\draw.io.exe`
         - `%LOCALAPPDATA%\Programs\draw.io\draw.io.exe`
-
+     
 - **Ubuntu/Linux Instructions**
     *   Open your terminal and navigate to the cloned repository directory. Then run draw.io using one of the following commands:
         ```bash
