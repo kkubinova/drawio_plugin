@@ -1,0 +1,166 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/28.2.5 Chrome/138.0.7204.251 Electron/37.6.1 Safari/537.36" version="28.2.5">
+  <diagram name="Page-1" id="hA5EhwlokRMzZ5kNL8Si">
+    <mxGraphModel dx="1425" dy="833" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <UserObject label="" customAnimation="" id="0">
+          <mxCell />
+        </UserObject>
+        <mxCell id="1" style="locked=1;" parent="0" />
+        <mxCell id="BankCD" value="CD" style="" parent="0" />
+        <mxCell id="Customer-1" value="Customer" style="swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rounded=0;shadow=0;strokeWidth=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="BankCD">
+          <mxGeometry x="95" y="50" width="170" height="112" as="geometry" />
+        </mxCell>
+        <mxCell id="Customer-2" value="+customerId: str" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=1;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="Customer-1">
+          <mxGeometry y="26" width="170" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="Customer-3" value="" style="line;html=1;strokeWidth=1;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=1;labelPosition=right;points=[];portConstraint=eastwest;" vertex="1" parent="Customer-1">
+          <mxGeometry y="52" width="170" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="Customer-4" value="+transferMoney(amount): void" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=1;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="Customer-1">
+          <mxGeometry y="60" width="170" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="Customer-5" value="+checkBalance(): int" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=1;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="Customer-1">
+          <mxGeometry y="86" width="170" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="Bank-1" value="Bank" style="swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rounded=0;shadow=0;strokeWidth=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="BankCD">
+          <mxGeometry x="335" y="50" width="190" height="112" as="geometry" />
+        </mxCell>
+        <mxCell id="Bank-2" value="+bankId: str" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=1;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="Bank-1">
+          <mxGeometry y="26" width="190" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="Bank-3" value="" style="line;html=1;strokeWidth=1;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=1;labelPosition=right;points=[];portConstraint=eastwest;" vertex="1" parent="Bank-1">
+          <mxGeometry y="52" width="190" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="Bank-4" value="+processTransfer(amount): bool" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=1;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="Bank-1">
+          <mxGeometry y="60" width="190" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="Bank-5" value="+sendNotification(msg): void" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=1;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="Bank-1">
+          <mxGeometry y="86" width="190" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="Account-1" value="Account" style="swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rounded=0;shadow=0;strokeWidth=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="BankCD">
+          <mxGeometry x="595" y="50" width="160" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="Account-2" value="+accountNumber: str" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=1;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="Account-1">
+          <mxGeometry y="26" width="160" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="Account-3" value="" style="line;html=1;strokeWidth=1;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=1;labelPosition=right;points=[];portConstraint=eastwest;" vertex="1" parent="Account-1">
+          <mxGeometry y="52" width="160" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="Account-4" value="+getBalance(): int" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=1;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="Account-1">
+          <mxGeometry y="60" width="160" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="Account-5" value="+debit(amount): void" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=1;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="Account-1">
+          <mxGeometry y="86" width="160" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="Account-6" value="+credit(amount): void" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=1;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="Account-1">
+          <mxGeometry y="112" width="160" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="rel1" value="uses" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;strokeColor=#666666;" edge="1" parent="BankCD" source="Customer-1" target="Bank-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rel2" value="manages" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;strokeColor=#666666;" edge="1" parent="BankCD" source="Bank-1" target="Account-1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="545" y="110" />
+              <mxPoint x="545" y="110" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="BankSqD" value="SqD" style="" parent="0" />
+        <mxCell id="bank-seq-group" value="" style="group;fillColor=none;" connectable="0" vertex="1" parent="BankSqD">
+          <mxGeometry x="90" y="230" width="750" height="550" as="geometry" />
+        </mxCell>
+        <mxCell id="bank-user" value="user" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;participant=umlActor;verticalAlign=bottom;labelPosition=center;verticalLabelPosition=top;align=center;size=65;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="bank-seq-group">
+          <mxGeometry width="40" height="400" as="geometry" />
+        </mxCell>
+        <mxCell id="bank-user-activation1" value="" style="points=[];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="bank-user">
+          <mxGeometry x="15" y="90" width="10" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="bank-user-activation3" value="" style="points=[];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="bank-user">
+          <mxGeometry x="15" y="270" width="10" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="bank-customer" value="Customer" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;size=65;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="bank-seq-group">
+          <mxGeometry x="120" width="120" height="400" as="geometry" />
+        </mxCell>
+        <mxCell id="bank-customer-activation1" value="" style="points=[];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="bank-customer">
+          <mxGeometry x="55" y="100" width="10" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="bank-customer-activation2" value="" style="points=[];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="bank-customer">
+          <mxGeometry x="55" y="270" width="10" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="bank-bank" value="Bank" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;size=65;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="bank-seq-group">
+          <mxGeometry x="320" width="120" height="400" as="geometry" />
+        </mxCell>
+        <mxCell id="bank-bank-activation1" value="" style="points=[];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="bank-bank">
+          <mxGeometry x="55" y="110" width="10" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="bank-account" value="Account" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;size=65;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="bank-seq-group">
+          <mxGeometry x="520" width="120" height="400" as="geometry" />
+        </mxCell>
+        <mxCell id="bank-account-activation1" value="" style="points=[];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="bank-account">
+          <mxGeometry x="55" y="123" width="10" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="bank-account-activation2" value="" style="points=[];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="bank-account">
+          <mxGeometry x="55" y="182" width="10" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="bank-msg1" value="transferMoney(500)" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=classic;fillColor=#f5f5f5;strokeColor=#666666;endFill=1;" edge="1" parent="bank-seq-group">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="25" y="100.10344827586209" as="sourcePoint" />
+            <mxPoint x="175" y="100" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bank-msg2" value="processTransfer(500)" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=classic;fillColor=#f5f5f5;strokeColor=#666666;endFill=1;" edge="1" parent="bank-seq-group">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="185" y="110" as="sourcePoint" />
+            <mxPoint x="375" y="110" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bank-msg3" value="getBalance()" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=classic;fillColor=#f5f5f5;strokeColor=#666666;endFill=1;" edge="1" parent="bank-seq-group">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="385" y="123" as="sourcePoint" />
+            <mxPoint x="575" y="123" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bank-msg4" value="balance: 1000" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;dashed=1;dashPattern=2 3;endArrow=classic;fillColor=#f5f5f5;strokeColor=#666666;endFill=1;" edge="1" parent="bank-seq-group">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="575" y="153" as="sourcePoint" />
+            <mxPoint x="385" y="153" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bank-msg5" value="debit(500)" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=classic;fillColor=#f5f5f5;strokeColor=#666666;endFill=1;" edge="1" parent="bank-seq-group">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="385" y="182" as="sourcePoint" />
+            <mxPoint x="575" y="182" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bank-account-activation3" value="" style="points=[];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="bank-seq-group">
+          <mxGeometry x="575" y="289" width="10" height="31" as="geometry" />
+        </mxCell>
+        <mxCell id="bank-msg11" value="checkBalance()" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=classic;fillColor=#f5f5f5;strokeColor=#666666;endFill=1;" edge="1" parent="bank-seq-group">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="25" y="270.44827586206907" as="sourcePoint" />
+            <mxPoint x="175" y="270.24" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bank-msg12" value="getBalance()" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=classic;fillColor=#f5f5f5;strokeColor=#666666;endFill=1;" edge="1" parent="bank-seq-group">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="185" y="289" as="sourcePoint" />
+            <mxPoint x="575" y="289" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bank-msg13" value="500" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;dashed=1;dashPattern=2 3;endArrow=classic;fillColor=#f5f5f5;strokeColor=#666666;endFill=1;" edge="1" parent="bank-seq-group">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="575" y="319" as="sourcePoint" />
+            <mxPoint x="185" y="319" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bank-msg14" value="balance: 500" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;dashed=1;dashPattern=2 3;endArrow=classic;fillColor=#f5f5f5;strokeColor=#666666;endFill=1;" edge="1" parent="bank-seq-group" target="bank-user-activation3">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="175" y="350" as="sourcePoint" />
+            <mxPoint x="35" y="350" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

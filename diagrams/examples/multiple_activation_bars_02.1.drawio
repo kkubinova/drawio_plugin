@@ -1,0 +1,213 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/28.2.5 Chrome/138.0.7204.251 Electron/37.6.1 Safari/537.36" version="28.2.5">
+  <diagram name="Page-1" id="hA5EhwlokRMzZ5kNL8Si">
+    <mxGraphModel dx="1425" dy="833" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <UserObject label="" customAnimation="" id="0">
+          <mxCell />
+        </UserObject>
+        <mxCell id="1" style="locked=1;" parent="0" />
+        <mxCell id="TrafficCD" value="CD" style="" parent="0" />
+        <mxCell id="TrafficController-1" value="TrafficController" style="swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rounded=0;shadow=0;strokeWidth=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="TrafficCD">
+          <mxGeometry x="50" y="50" width="180" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="TrafficController-2" value="+controllerId: str" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=1;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="TrafficController-1">
+          <mxGeometry y="26" width="180" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="TrafficController-3" value="" style="line;html=1;strokeWidth=1;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=1;labelPosition=right;points=[];portConstraint=eastwest;" vertex="1" parent="TrafficController-1">
+          <mxGeometry y="52" width="180" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="TrafficController-4" value="+manageMorningRush(): void" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=1;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="TrafficController-1">
+          <mxGeometry y="60" width="180" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="TrafficController-5" value="+handleAccident(): void" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=1;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="TrafficController-1">
+          <mxGeometry y="86" width="180" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="TrafficController-6" value="+optimizeEvening(): void" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=1;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="TrafficController-1">
+          <mxGeometry y="112" width="180" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="TrafficLight-1" value="TrafficLight" style="swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rounded=0;shadow=0;strokeWidth=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="TrafficCD">
+          <mxGeometry x="290" y="50" width="190" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="TrafficLight-2" value="+lightId: str" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=1;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="TrafficLight-1">
+          <mxGeometry y="26" width="190" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="TrafficLight-3" value="" style="line;html=1;strokeWidth=1;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=1;labelPosition=right;points=[];portConstraint=eastwest;" vertex="1" parent="TrafficLight-1">
+          <mxGeometry y="52" width="190" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="TrafficLight-4" value="+changeSequence(timing): void" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=1;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="TrafficLight-1">
+          <mxGeometry y="60" width="190" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="TrafficLight-5" value="+switchToEmergency(): void" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=1;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="TrafficLight-1">
+          <mxGeometry y="86" width="190" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="SensorSystem-1" value="SensorSystem" style="swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rounded=0;shadow=0;strokeWidth=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="TrafficCD">
+          <mxGeometry x="510" y="50" width="160" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="SensorSystem-2" value="+sensorId: str" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=1;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="SensorSystem-1">
+          <mxGeometry y="26" width="160" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="SensorSystem-3" value="" style="line;html=1;strokeWidth=1;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=1;labelPosition=right;points=[];portConstraint=eastwest;" vertex="1" parent="SensorSystem-1">
+          <mxGeometry y="52" width="160" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="SensorSystem-4" value="+measureTraffic(): int" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=1;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="SensorSystem-1">
+          <mxGeometry y="60" width="160" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="SensorSystem-5" value="+detectIncident(): bool" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=1;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="SensorSystem-1">
+          <mxGeometry y="86" width="160" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="EmergencyService-1" value="EmergencyService" style="swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rounded=0;shadow=0;strokeWidth=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="TrafficCD">
+          <mxGeometry x="730" y="50" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="EmergencyService-2" value="+serviceId: str" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=1;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="EmergencyService-1">
+          <mxGeometry y="26" width="160" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="EmergencyService-3" value="" style="line;html=1;strokeWidth=1;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=1;labelPosition=right;points=[];portConstraint=eastwest;" vertex="1" parent="EmergencyService-1">
+          <mxGeometry y="52" width="160" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="EmergencyService-4" value="+dispatchUnits(): void" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=1;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="EmergencyService-1">
+          <mxGeometry y="60" width="160" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="rel1" value="controls" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;strokeColor=#666666;" parent="TrafficCD" source="TrafficController-1" target="TrafficLight-1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="240" y="110" />
+              <mxPoint x="240" y="110" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="rel2" value="monitors" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;strokeColor=#666666;" parent="TrafficCD" source="TrafficController-1" target="SensorSystem-1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="140" y="200" />
+              <mxPoint x="590" y="200" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="rel3" value="alerts" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;strokeColor=#666666;" parent="TrafficCD" source="TrafficController-1" target="EmergencyService-1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="140" y="220" />
+              <mxPoint x="810" y="220" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="TrafficSqD" value="SqD" style="" parent="0" />
+        <mxCell id="traffic-seq-group" value="" style="group;fillColor=none;" connectable="0" vertex="1" parent="TrafficSqD">
+          <mxGeometry x="50" y="280" width="950" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="traffic-controller" value="TrafficController" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;size=65;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="traffic-seq-group">
+          <mxGeometry width="150" height="500" as="geometry" />
+        </mxCell>
+        <mxCell id="traffic-controller-activation1" value="" style="points=[];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="traffic-controller">
+          <mxGeometry x="70" y="80" width="10" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="traffic-controller-activation2" value="" style="points=[];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="traffic-controller">
+          <mxGeometry x="70" y="229.71" width="10" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="traffic-light" value="TrafficLight" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;size=65;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="traffic-seq-group">
+          <mxGeometry x="230" width="120" height="500" as="geometry" />
+        </mxCell>
+        <mxCell id="traffic-light-activation1" value="" style="points=[];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="traffic-light">
+          <mxGeometry x="55" y="170" width="10" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="traffic-controller-activation3" value="" style="points=[];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="traffic-light">
+          <mxGeometry x="-160" y="410" width="10" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="traffic-light-activation3" value="" style="points=[];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="traffic-light">
+          <mxGeometry x="55" y="430" width="10" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="traffic-msg12" value="changeSequence(eveningTiming)" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=classic;fillColor=#f5f5f5;strokeColor=#666666;endFill=1;" edge="1" parent="traffic-light">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="-150" y="430" as="sourcePoint" />
+            <mxPoint x="55" y="430" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="traffic-msg13" value="optimized" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;dashed=1;dashPattern=2 3;endArrow=classic;fillColor=#f5f5f5;strokeColor=#666666;endFill=1;" edge="1" parent="traffic-light">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="55" y="460" as="sourcePoint" />
+            <mxPoint x="-150" y="460" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="traffic-emergency" value="EmergencyService" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;size=65;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="traffic-seq-group">
+          <mxGeometry x="630" width="150" height="500" as="geometry" />
+        </mxCell>
+        <mxCell id="traffic-msg8" value="incident detected" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;dashed=1;dashPattern=2 3;endArrow=classic;fillColor=#f5f5f5;strokeColor=#666666;endFill=1;" edge="1" parent="traffic-emergency" target="traffic-controller-activation2">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="-160" y="279.71" as="sourcePoint" />
+            <mxPoint x="-580" y="279.71" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="traffic-msg9" value="switchToEmergency()" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=classic;fillColor=#f5f5f5;strokeColor=#666666;endFill=1;" edge="1" parent="traffic-emergency" source="traffic-controller-activation2">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="-550" y="300" as="sourcePoint" />
+            <mxPoint x="-375" y="303.71" as="targetPoint" />
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="traffic-msg10" value="dispatchUnits()" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=classic;fillColor=#f5f5f5;strokeColor=#666666;endFill=1;" edge="1" parent="traffic-emergency" source="traffic-controller-activation2">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="-550" y="350" as="sourcePoint" />
+            <mxPoint x="70" y="347.71" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="traffic-light-activation2" value="" style="points=[];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="traffic-emergency">
+          <mxGeometry x="-375" y="303.71" width="10" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="traffic-emergency-activation1" value="" style="points=[];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="traffic-emergency">
+          <mxGeometry x="70" y="347.71" width="10" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="dyqGKQJXnqVCOa5znBYD-1" value="" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;dashed=1;dashPattern=2 3;endArrow=classic;fillColor=#f5f5f5;strokeColor=#666666;endFill=1;" edge="1" parent="traffic-emergency" target="traffic-controller-activation2">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="-375" y="333.71" as="sourcePoint" />
+            <mxPoint x="-580" y="333.71" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="traffic-msg2" value="measureTraffic()" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=classic;fillColor=#f5f5f5;strokeColor=#666666;endFill=1;" edge="1" parent="traffic-seq-group" target="traffic-sensor-activation1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="80" y="110" as="sourcePoint" />
+            <mxPoint x="500" y="110" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="traffic-msg3" value="density: 85%" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;dashed=1;dashPattern=2 3;endArrow=classic;fillColor=#f5f5f5;strokeColor=#666666;endFill=1;" edge="1" parent="traffic-seq-group">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="500" y="140" as="sourcePoint" />
+            <mxPoint x="80" y="140" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="traffic-msg4" value="changeSequence(rushHourTiming)" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=classic;fillColor=#f5f5f5;strokeColor=#666666;endFill=1;" edge="1" parent="traffic-seq-group">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="80" y="170" as="sourcePoint" />
+            <mxPoint x="285" y="170" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="traffic-msg5" value="sequence updated" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;dashed=1;dashPattern=2 3;endArrow=classic;fillColor=#f5f5f5;strokeColor=#666666;endFill=1;" edge="1" parent="traffic-seq-group">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="285" y="200" as="sourcePoint" />
+            <mxPoint x="80" y="200" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="traffic-sensor" value="SensorSystem" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;size=65;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="traffic-seq-group">
+          <mxGeometry x="420" width="150" height="500" as="geometry" />
+        </mxCell>
+        <mxCell id="traffic-sensor-activation1" value="" style="points=[];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="traffic-sensor">
+          <mxGeometry x="70" y="110" width="10" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="traffic-sensor-activation2" value="" style="points=[];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="traffic-seq-group">
+          <mxGeometry x="460" y="249.71" width="10" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="traffic-msg7" value="detectIncident()" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=classic;fillColor=#f5f5f5;strokeColor=#666666;endFill=1;" edge="1" parent="traffic-seq-group">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="80" y="249.9310344827586" as="sourcePoint" />
+            <mxPoint x="460" y="249.9310344827586" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="dyqGKQJXnqVCOa5znBYD-2" value="" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;dashed=1;dashPattern=2 3;endArrow=classic;fillColor=#f5f5f5;strokeColor=#666666;endFill=1;" edge="1" parent="traffic-seq-group">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="700" y="369.57142857142867" as="sourcePoint" />
+            <mxPoint x="80" y="369.57142857142867" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

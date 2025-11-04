@@ -1,0 +1,125 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/28.2.5 Chrome/138.0.7204.251 Electron/37.6.1 Safari/537.36" version="28.2.5">
+  <diagram id="STcs4dz_XdI653FTebF8" name="Page-1">
+    <mxGraphModel dx="2066" dy="1208" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <UserObject label="" customAnimation="" id="0">
+          <mxCell />
+        </UserObject>
+        <mxCell id="1" style="locked=1;" parent="0" />
+        <mxCell id="LibraryCD" value="CD" style="" parent="0" />
+        <mxCell id="Student-1" value="Student" style="swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rounded=0;shadow=0;strokeWidth=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="LibraryCD" vertex="1">
+          <mxGeometry x="40" y="50" width="180" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="Student-2" value="+studentId: str" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=1;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="Student-1" vertex="1">
+          <mxGeometry y="26" width="180" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="Student-3" value="" style="line;html=1;strokeWidth=1;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=1;labelPosition=right;points=[];portConstraint=eastwest;" parent="Student-1" vertex="1">
+          <mxGeometry y="52" width="180" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="Student-4" value="+borrowBooks(books: list): void" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=1;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="Student-1" vertex="1">
+          <mxGeometry y="60" width="180" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="Library-1" value="Library" style="swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rounded=0;shadow=0;strokeWidth=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="LibraryCD" vertex="1">
+          <mxGeometry x="320" y="50" width="200" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="Library-2" value="+name: str" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=1;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="Library-1" vertex="1">
+          <mxGeometry y="26" width="200" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="Library-3" value="" style="line;html=1;strokeWidth=1;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=1;labelPosition=right;points=[];portConstraint=eastwest;" parent="Library-1" vertex="1">
+          <mxGeometry y="52" width="200" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="Library-4" value="+processBorrow(books: list): void" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=1;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="Library-1" vertex="1">
+          <mxGeometry y="60" width="200" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="BookRecord-1" value="BookRecord" style="swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rounded=0;shadow=0;strokeWidth=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="LibraryCD" vertex="1">
+          <mxGeometry x="600" y="50" width="180" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="BookRecord-2" value="+bookId: str" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=1;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="BookRecord-1" vertex="1">
+          <mxGeometry y="26" width="180" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="BookRecord-3" value="" style="line;html=1;strokeWidth=1;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=1;labelPosition=right;points=[];portConstraint=eastwest;" parent="BookRecord-1" vertex="1">
+          <mxGeometry y="52" width="180" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="BookRecord-4" value="+updateStatus(status: str): void" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=1;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="BookRecord-1" vertex="1">
+          <mxGeometry y="60" width="180" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="rel1" value="borrows from" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;strokeColor=#666666;" parent="LibraryCD" source="Student-1" target="Library-1" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rel2" value="manages" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;strokeColor=#666666;" parent="LibraryCD" source="Library-1" target="BookRecord-1" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="LibrarySqD" value="SqD" style="" parent="0" />
+        <mxCell id="lib-seq-group" value="" style="group;fillColor=none;" parent="LibrarySqD" connectable="0" vertex="1">
+          <mxGeometry x="150" y="200" width="700" height="400" as="geometry" />
+        </mxCell>
+        <mxCell id="lib-user" value="user" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;participant=umlActor;verticalAlign=bottom;labelPosition=center;verticalLabelPosition=top;align=center;size=65;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="lib-seq-group" vertex="1">
+          <mxGeometry x="-75" width="40" height="330" as="geometry" />
+        </mxCell>
+        <mxCell id="lib-user-activation" value="" style="points=[];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="lib-user" vertex="1">
+          <mxGeometry x="15" y="70" width="10" height="230" as="geometry" />
+        </mxCell>
+        <mxCell id="lib-student" value="Student" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;size=65;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="lib-seq-group" vertex="1">
+          <mxGeometry x="120" width="120" height="330" as="geometry" />
+        </mxCell>
+        <mxCell id="lib-student-activation" value="" style="points=[];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="lib-student" vertex="1">
+          <mxGeometry x="55" y="90" width="10" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="lib-library" value="Library" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;size=65;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="lib-seq-group" vertex="1">
+          <mxGeometry x="305" width="120" height="330" as="geometry" />
+        </mxCell>
+        <mxCell id="lib-library-activation" value="" style="points=[];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="lib-library" vertex="1">
+          <mxGeometry x="55" y="110" width="10" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="lib-bookrecord" value="BookRecord" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;size=65;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="lib-seq-group" vertex="1">
+          <mxGeometry x="505" width="120" height="330" as="geometry" />
+        </mxCell>
+        <mxCell id="lib-msg1" value="borrowBooks([&quot;Book1&quot;, &quot;Book2&quot;, &quot;Book3&quot;])" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=classic;fillColor=#f5f5f5;strokeColor=#666666;endFill=1;" parent="lib-seq-group" target="lib-student-activation" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="-50" y="90" as="sourcePoint" />
+            <mxPoint x="145" y="100" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="lib-msg2" value="processBorrow(bookList)" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=classic;fillColor=#f5f5f5;strokeColor=#666666;endFill=1;" parent="lib-seq-group" source="lib-student-activation" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="170" y="110" as="sourcePoint" />
+            <mxPoint x="360" y="110" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="lib-loop-frame" value="loop" style="shape=umlFrame;pointerEvents=0;dropTarget=0;strokeColor=#666666;height=20;width=40;fillColor=#f5f5f5;fontColor=#333333;" parent="lib-seq-group" vertex="1">
+          <mxGeometry x="-35" y="130" width="640" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="lib-loop-condition" value="[for each book in bookList]" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;" parent="lib-loop-frame" vertex="1">
+          <mxGeometry x="49.230769230769226" width="590.7692307692307" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="lib-loop-msg1" value="updateStatus(&quot;borrowed&quot;)" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=classic;fillColor=#f5f5f5;strokeColor=#666666;endFill=1;" parent="lib-seq-group" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="370" y="170" as="sourcePoint" />
+            <mxPoint x="560" y="170" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="lib-loop-activation1" value="" style="points=[];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="lib-seq-group" vertex="1">
+          <mxGeometry x="560" y="170" width="10" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="lib-loop-msg2" value="status updated" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;dashed=1;dashPattern=2 3;endArrow=classic;fillColor=#f5f5f5;strokeColor=#666666;endFill=1;" parent="lib-seq-group" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="560" y="200" as="sourcePoint" />
+            <mxPoint x="370" y="200" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="lib-final-msg1" value="all books processed" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;dashed=1;dashPattern=2 3;endArrow=classic;fillColor=#f5f5f5;strokeColor=#666666;endFill=1;" parent="lib-seq-group" source="lib-library-activation" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="355" y="250" as="sourcePoint" />
+            <mxPoint x="185" y="250" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="lib-final-msg2" value="books borrowed successfully" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;dashed=1;dashPattern=2 3;endArrow=classic;fillColor=#f5f5f5;strokeColor=#666666;endFill=1;" parent="lib-seq-group" target="lib-user-activation" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="175" y="269.1034482758621" as="sourcePoint" />
+            <mxPoint x="-15" y="269.24" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
