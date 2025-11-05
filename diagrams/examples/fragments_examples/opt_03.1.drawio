@@ -1,12 +1,12 @@
 <mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/28.2.5 Chrome/138.0.7204.251 Electron/37.6.1 Safari/537.36" version="28.2.5">
   <diagram name="Page-1" id="hA5EhwlokRMzZ5kNL8Si">
-    <mxGraphModel dx="1722" dy="1007" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="2066" dy="1208" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <UserObject label="" customAnimation="" id="0">
           <mxCell />
         </UserObject>
         <mxCell id="1" style="locked=1;" parent="0" />
-        <mxCell id="LibraryCD" value="CD" style="" parent="0" />
+        <mxCell id="LibraryCD" value="CD" style="locked=1;" parent="0" />
         <mxCell id="Library-1" value="Library" style="swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rounded=0;shadow=0;strokeWidth=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="LibraryCD" vertex="1">
           <mxGeometry x="310" y="50" width="260" height="140" as="geometry" />
         </mxCell>
@@ -256,7 +256,7 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="H5hhl_Ia_uFw0meZTym0-1" value="true" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;dashed=1;dashPattern=2 3;endArrow=classic;fillColor=#f5f5f5;strokeColor=#666666;endFill=1;" parent="seq-group" edge="1">
+        <mxCell id="H5hhl_Ia_uFw0meZTym0-1" value="true" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;dashed=1;dashPattern=2 3;endArrow=classic;fillColor=#f5f5f5;strokeColor=#666666;endFill=1;" parent="seq-group" target="seq-library-activation" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="235.06" y="328.71" as="sourcePoint" />
             <mxPoint x="460" y="330" as="targetPoint" />
