@@ -1,61 +1,61 @@
 <mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/28.2.5 Chrome/138.0.7204.251 Electron/37.6.1 Safari/537.36" version="28.2.5">
   <diagram name="Page-1" id="hA5EhwlokRMzZ5kNL8Si">
-    <mxGraphModel dx="1425" dy="833" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="2066" dy="1208" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <UserObject label="" customAnimation="" id="0">
           <mxCell />
         </UserObject>
         <mxCell id="1" style="locked=1;" parent="0" />
         <mxCell id="ShopCD" value="CD" style="locked=1;" parent="0" />
-        <mxCell id="Customer-1" value="Customer" style="swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rounded=0;shadow=0;strokeWidth=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="ShopCD">
-          <mxGeometry x="180" y="50" width="160" height="100" as="geometry" />
+        <mxCell id="Customer-1" value="Customer" style="swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rounded=0;shadow=0;strokeWidth=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="ShopCD" vertex="1">
+          <mxGeometry x="180" y="50" width="160" height="90" as="geometry" />
         </mxCell>
-        <mxCell id="Customer-2" value="+customerId: str" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=1;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="Customer-1">
+        <mxCell id="Customer-2" value="+customerId: str" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=1;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="Customer-1" vertex="1">
           <mxGeometry y="26" width="160" height="26" as="geometry" />
         </mxCell>
-        <mxCell id="Customer-3" value="" style="line;html=1;strokeWidth=1;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=1;labelPosition=right;points=[];portConstraint=eastwest;" vertex="1" parent="Customer-1">
+        <mxCell id="Customer-3" value="" style="line;html=1;strokeWidth=1;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=1;labelPosition=right;points=[];portConstraint=eastwest;" parent="Customer-1" vertex="1">
           <mxGeometry y="52" width="160" height="8" as="geometry" />
         </mxCell>
-        <mxCell id="Customer-4" value="+placeOrder(item: str): void" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=1;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="Customer-1">
+        <mxCell id="Customer-4" value="+placeOrder(item: str): void" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=1;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="Customer-1" vertex="1">
           <mxGeometry y="60" width="160" height="26" as="geometry" />
         </mxCell>
-        <mxCell id="Shop-1" value="Shop" style="swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rounded=0;shadow=0;strokeWidth=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="ShopCD">
-          <mxGeometry x="400" y="50" width="180" height="120" as="geometry" />
+        <mxCell id="Shop-1" value="Shop" style="swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rounded=0;shadow=0;strokeWidth=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="ShopCD" vertex="1">
+          <mxGeometry x="400" y="50" width="190" height="120" as="geometry" />
         </mxCell>
-        <mxCell id="Shop-2" value="+name: str" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=1;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="Shop-1">
-          <mxGeometry y="26" width="180" height="26" as="geometry" />
+        <mxCell id="Shop-2" value="+name: str" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=1;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="Shop-1" vertex="1">
+          <mxGeometry y="26" width="190" height="26" as="geometry" />
         </mxCell>
-        <mxCell id="Shop-3" value="" style="line;html=1;strokeWidth=1;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=1;labelPosition=right;points=[];portConstraint=eastwest;" vertex="1" parent="Shop-1">
-          <mxGeometry y="52" width="180" height="8" as="geometry" />
+        <mxCell id="Shop-3" value="" style="line;html=1;strokeWidth=1;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=1;labelPosition=right;points=[];portConstraint=eastwest;" parent="Shop-1" vertex="1">
+          <mxGeometry y="52" width="190" height="8" as="geometry" />
         </mxCell>
-        <mxCell id="Shop-4" value="+processOrder(item: str): bool" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=1;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="Shop-1">
-          <mxGeometry y="60" width="180" height="26" as="geometry" />
+        <mxCell id="Shop-4" value="+processOrder(item: str): bool" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=1;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="Shop-1" vertex="1">
+          <mxGeometry y="60" width="190" height="26" as="geometry" />
         </mxCell>
-        <mxCell id="Shop-5" value="+notifyPayment(amount: int): void" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=1;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="Shop-1">
-          <mxGeometry y="86" width="180" height="26" as="geometry" />
+        <mxCell id="Shop-5" value="+notifyPayment(amount: int): void" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=1;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="Shop-1" vertex="1">
+          <mxGeometry y="86" width="190" height="26" as="geometry" />
         </mxCell>
-        <mxCell id="Inventory-1" value="Inventory" style="swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rounded=0;shadow=0;strokeWidth=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="ShopCD">
-          <mxGeometry x="640" y="50" width="160" height="100" as="geometry" />
+        <mxCell id="Inventory-1" value="Inventory" style="swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rounded=0;shadow=0;strokeWidth=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="ShopCD" vertex="1">
+          <mxGeometry x="650" y="50" width="160" height="90" as="geometry" />
         </mxCell>
-        <mxCell id="Inventory-2" value="+items: list" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=1;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="Inventory-1">
+        <mxCell id="Inventory-2" value="+items: list" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=1;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="Inventory-1" vertex="1">
           <mxGeometry y="26" width="160" height="26" as="geometry" />
         </mxCell>
-        <mxCell id="Inventory-3" value="" style="line;html=1;strokeWidth=1;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=1;labelPosition=right;points=[];portConstraint=eastwest;" vertex="1" parent="Inventory-1">
+        <mxCell id="Inventory-3" value="" style="line;html=1;strokeWidth=1;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=1;labelPosition=right;points=[];portConstraint=eastwest;" parent="Inventory-1" vertex="1">
           <mxGeometry y="52" width="160" height="8" as="geometry" />
         </mxCell>
-        <mxCell id="Inventory-4" value="+checkStock(item: str): bool" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=1;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="Inventory-1">
+        <mxCell id="Inventory-4" value="+checkStock(item: str): bool" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=1;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="Inventory-1" vertex="1">
           <mxGeometry y="60" width="160" height="26" as="geometry" />
         </mxCell>
-        <mxCell id="Payment-1" value="Payment" style="swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rounded=0;shadow=0;strokeWidth=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="ShopCD">
-          <mxGeometry x="400" y="220" width="180" height="100" as="geometry" />
+        <mxCell id="Payment-1" value="Payment" style="swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rounded=0;shadow=0;strokeWidth=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="ShopCD" vertex="1">
+          <mxGeometry x="400" y="220" width="180" height="90" as="geometry" />
         </mxCell>
-        <mxCell id="Payment-2" value="+amount: int" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=1;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="Payment-1">
+        <mxCell id="Payment-2" value="+amount: int" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=1;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="Payment-1" vertex="1">
           <mxGeometry y="26" width="180" height="26" as="geometry" />
         </mxCell>
-        <mxCell id="Payment-3" value="" style="line;html=1;strokeWidth=1;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=1;labelPosition=right;points=[];portConstraint=eastwest;" vertex="1" parent="Payment-1">
+        <mxCell id="Payment-3" value="" style="line;html=1;strokeWidth=1;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=1;labelPosition=right;points=[];portConstraint=eastwest;" parent="Payment-1" vertex="1">
           <mxGeometry y="52" width="180" height="8" as="geometry" />
         </mxCell>
-        <mxCell id="Payment-4" value="+processPayment(): bool" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=1;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="Payment-1">
+        <mxCell id="Payment-4" value="+processPayment(): bool" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=1;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="Payment-1" vertex="1">
           <mxGeometry y="60" width="180" height="26" as="geometry" />
         </mxCell>
         <mxCell id="rel1" value="shops at" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;strokeColor=#666666;" parent="ShopCD" source="Customer-1" target="Shop-1" edge="1">
@@ -66,7 +66,7 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="rel2" value="checks" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;strokeColor=#666666;" edge="1" parent="ShopCD" source="Shop-1" target="Inventory-1">
+        <mxCell id="rel2" value="checks" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;strokeColor=#666666;" parent="ShopCD" source="Shop-1" target="Inventory-1" edge="1">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
               <mxPoint x="590" y="100" />
@@ -74,81 +74,81 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="rel3" value="uses" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;strokeColor=#666666;" edge="1" parent="ShopCD" source="Shop-1" target="Payment-1">
+        <mxCell id="rel3" value="uses" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;strokeColor=#666666;" parent="ShopCD" source="Shop-1" target="Payment-1" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="ShopSqD" value="SqD" style="" parent="0" />
-        <mxCell id="shop-seq-group" value="" style="group;fillColor=none;" connectable="0" vertex="1" parent="ShopSqD">
+        <mxCell id="shop-seq-group" value="" style="group;fillColor=none;" parent="ShopSqD" connectable="0" vertex="1">
           <mxGeometry x="100" y="380" width="890" height="400" as="geometry" />
         </mxCell>
-        <mxCell id="shop-customer" value="customer" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;participant=umlActor;verticalAlign=bottom;labelPosition=center;verticalLabelPosition=top;align=center;size=65;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="shop-seq-group">
+        <mxCell id="shop-customer" value="customer" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;participant=umlActor;verticalAlign=bottom;labelPosition=center;verticalLabelPosition=top;align=center;size=65;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="shop-seq-group" vertex="1">
           <mxGeometry width="40" height="400" as="geometry" />
         </mxCell>
-        <mxCell id="shop-customer-activation" value="" style="points=[];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="shop-customer">
+        <mxCell id="shop-customer-activation" value="" style="points=[];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="shop-customer" vertex="1">
           <mxGeometry x="15" y="70" width="10" height="260" as="geometry" />
         </mxCell>
-        <mxCell id="shop-shop" value="Customer" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;size=65;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="shop-seq-group">
+        <mxCell id="shop-shop" value="Customer" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;size=65;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="shop-seq-group" vertex="1">
           <mxGeometry x="180" width="120" height="400" as="geometry" />
         </mxCell>
-        <mxCell id="shop-shop-activation" value="" style="points=[];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="shop-shop">
+        <mxCell id="shop-shop-activation" value="" style="points=[];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="shop-shop" vertex="1">
           <mxGeometry x="55" y="90" width="10" height="240" as="geometry" />
         </mxCell>
-        <mxCell id="shop-inventory" value="Shop" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;size=65;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="shop-seq-group">
+        <mxCell id="shop-inventory" value="Shop" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;size=65;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="shop-seq-group" vertex="1">
           <mxGeometry x="380" width="120" height="400" as="geometry" />
         </mxCell>
-        <mxCell id="shop-inventory-activation" value="" style="points=[];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="shop-inventory">
-          <mxGeometry x="55" y="110" width="10" height="180" as="geometry" />
+        <mxCell id="shop-inventory-activation" value="" style="points=[];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="shop-inventory" vertex="1">
+          <mxGeometry x="55" y="110" width="10" height="200" as="geometry" />
         </mxCell>
-        <mxCell id="shop-payment" value="Inventory" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;size=65;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="shop-seq-group">
+        <mxCell id="shop-payment" value="Inventory" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;size=65;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="shop-seq-group" vertex="1">
           <mxGeometry x="580" width="120" height="400" as="geometry" />
         </mxCell>
-        <mxCell id="shop-payment-activation" value="" style="points=[];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="shop-payment">
-          <mxGeometry x="55" y="220" width="10" height="50" as="geometry" />
+        <mxCell id="shop-payment-activation" value="" style="points=[];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="shop-payment" vertex="1">
+          <mxGeometry x="55" y="208" width="10" height="50" as="geometry" />
         </mxCell>
-        <mxCell id="shop-msg1" value="placeOrder(&quot;laptop&quot;)" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=classic;fillColor=#f5f5f5;strokeColor=#666666;endFill=1;" edge="1" parent="shop-seq-group">
+        <mxCell id="shop-msg1" value="placeOrder(&quot;laptop&quot;)" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=classic;fillColor=#f5f5f5;strokeColor=#666666;endFill=1;" parent="shop-seq-group" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="25" y="90" as="sourcePoint" />
             <mxPoint x="235" y="90" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="shop-msg2" value="processOrder(&quot;laptop&quot;)" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=classic;fillColor=#f5f5f5;strokeColor=#666666;endFill=1;" edge="1" parent="shop-seq-group">
+        <mxCell id="shop-msg2" value="processOrder(&quot;laptop&quot;)" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=classic;fillColor=#f5f5f5;strokeColor=#666666;endFill=1;" parent="shop-seq-group" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="245" y="110" as="sourcePoint" />
             <mxPoint x="435" y="110" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="shop-msg3" value="checkStock(&quot;laptop&quot;)" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=classic;fillColor=#f5f5f5;strokeColor=#666666;endFill=1;" edge="1" parent="shop-seq-group">
+        <mxCell id="shop-msg3" value="checkStock(&quot;laptop&quot;)" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=classic;fillColor=#f5f5f5;strokeColor=#666666;endFill=1;" parent="shop-seq-group" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="445" y="130" as="sourcePoint" />
             <mxPoint x="635" y="130.20000000000005" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="shop-opt-frame" value="opt" style="shape=umlFrame;pointerEvents=0;dropTarget=0;strokeColor=#666666;height=20;width=30;fillColor=#f5f5f5;fontColor=#333333;" vertex="1" parent="shop-seq-group">
-          <mxGeometry x="-20" y="193" width="910" height="110" as="geometry" />
+        <mxCell id="shop-opt-frame" value="opt" style="shape=umlFrame;pointerEvents=0;dropTarget=0;strokeColor=#666666;height=20;width=30;fillColor=#f5f5f5;fontColor=#333333;" parent="shop-seq-group" vertex="1">
+          <mxGeometry x="-20" y="181" width="910" height="110" as="geometry" />
         </mxCell>
-        <mxCell id="shop-opt-condition" value="[item in stock]" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;" vertex="1" parent="shop-opt-frame">
+        <mxCell id="shop-opt-condition" value="[item in stock]" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;" parent="shop-opt-frame" vertex="1">
           <mxGeometry x="64.08450704225352" width="845.9154929577466" height="18.333333333333332" as="geometry" />
         </mxCell>
-        <mxCell id="shop-msg5" value="notifyPayment(999)" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=classic;fillColor=#f5f5f5;strokeColor=#666666;endFill=1;" edge="1" parent="shop-seq-group" source="shop-inventory-activation">
+        <mxCell id="shop-msg5" value="notifyPayment(999)" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=classic;fillColor=#f5f5f5;strokeColor=#666666;endFill=1;" parent="shop-seq-group" edge="1">
           <mxGeometry relative="1" as="geometry">
-            <mxPoint x="470" y="220" as="sourcePoint" />
-            <mxPoint x="635" y="220" as="targetPoint" />
+            <mxPoint x="445" y="208" as="sourcePoint" />
+            <mxPoint x="635" y="208" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="shop-msg6" value="processPayment()" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=classic;fillColor=#f5f5f5;strokeColor=#666666;endFill=1;" edge="1" parent="shop-seq-group" target="lx8ESdtZY8GpQo2wmAVH-2">
+        <mxCell id="shop-msg6" value="processPayment()" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=classic;fillColor=#f5f5f5;strokeColor=#666666;endFill=1;" parent="shop-seq-group" target="lx8ESdtZY8GpQo2wmAVH-2" edge="1">
           <mxGeometry relative="1" as="geometry">
-            <mxPoint x="645" y="232" as="sourcePoint" />
-            <mxPoint x="655" y="232" as="targetPoint" />
+            <mxPoint x="645" y="220" as="sourcePoint" />
+            <mxPoint x="655" y="220" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="lx8ESdtZY8GpQo2wmAVH-3" value="" style="points=[];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="shop-seq-group">
+        <mxCell id="lx8ESdtZY8GpQo2wmAVH-3" value="" style="points=[];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="shop-seq-group" vertex="1">
           <mxGeometry x="635" y="130" width="10" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="lx8ESdtZY8GpQo2wmAVH-1" value="Payment" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;size=65;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="ShopSqD">
+        <mxCell id="lx8ESdtZY8GpQo2wmAVH-1" value="Payment" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;size=65;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="ShopSqD" vertex="1">
           <mxGeometry x="860" y="380" width="120" height="400" as="geometry" />
         </mxCell>
-        <mxCell id="lx8ESdtZY8GpQo2wmAVH-2" value="" style="points=[];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="lx8ESdtZY8GpQo2wmAVH-1">
-          <mxGeometry x="55" y="232" width="10" height="30" as="geometry" />
+        <mxCell id="lx8ESdtZY8GpQo2wmAVH-2" value="" style="points=[];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="lx8ESdtZY8GpQo2wmAVH-1" vertex="1">
+          <mxGeometry x="55" y="220" width="10" height="30" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

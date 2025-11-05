@@ -1,6 +1,6 @@
 <mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/28.2.5 Chrome/138.0.7204.251 Electron/37.6.1 Safari/537.36" version="28.2.5">
   <diagram id="STcs4dz_XdI653FTebF8" name="Page-1">
-    <mxGraphModel dx="2066" dy="1208" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1722" dy="1007" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <UserObject label="" customAnimation="" id="0">
           <mxCell />
@@ -8,7 +8,7 @@
         <mxCell id="1" style="locked=1;" parent="0" />
         <mxCell id="CourseCD" value="CD" style="" parent="0" />
         <mxCell id="Student-1" value="Student" style="swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rounded=0;shadow=0;strokeWidth=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="CourseCD" vertex="1">
-          <mxGeometry x="90" y="50" width="210" height="90" as="geometry" />
+          <mxGeometry x="90" y="50" width="210" height="86" as="geometry" />
         </mxCell>
         <mxCell id="Student-2" value="+studentId: str" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=1;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="Student-1" vertex="1">
           <mxGeometry y="26" width="210" height="26" as="geometry" />
@@ -56,7 +56,7 @@
           <mxGeometry y="138" width="200" height="26" as="geometry" />
         </mxCell>
         <mxCell id="Professor-1" value="Professor" style="swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rounded=0;shadow=0;strokeWidth=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="CourseCD" vertex="1">
-          <mxGeometry x="360" y="220" width="215" height="90" as="geometry" />
+          <mxGeometry x="360" y="220" width="215" height="86" as="geometry" />
         </mxCell>
         <mxCell id="Professor-2" value="+professorId: str" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=1;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="Professor-1" vertex="1">
           <mxGeometry y="26" width="215" height="26" as="geometry" />
@@ -102,7 +102,7 @@
           <mxGeometry width="40" height="600" as="geometry" />
         </mxCell>
         <mxCell id="course-user-activation" value="" style="points=[];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="course-user" vertex="1">
-          <mxGeometry x="15" y="80" width="10" height="470" as="geometry" />
+          <mxGeometry x="15" y="80" width="10" height="450" as="geometry" />
         </mxCell>
         <mxCell id="course-student" value="Student" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;size=65;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="course-seq-group" vertex="1">
           <mxGeometry x="120" width="120" height="600" as="geometry" />
@@ -168,7 +168,7 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="course-system-activation" value="" style="points=[];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="course-seq-group" vertex="1">
-          <mxGeometry x="385" y="170" width="10" height="290" as="geometry" />
+          <mxGeometry x="385" y="170" width="10" height="310" as="geometry" />
         </mxCell>
         <mxCell id="course-loop1-msg6" value="getProfessors()" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=classic;fillColor=#f5f5f5;strokeColor=#666666;endFill=1;" parent="course-seq-group" edge="1">
           <mxGeometry relative="1" as="geometry">
@@ -186,10 +186,10 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="course-loop2-frame" value="loop" style="shape=umlFrame;pointerEvents=0;dropTarget=0;strokeColor=#666666;height=20;width=40;fillColor=#fff3e0;fontColor=#333333;" parent="course-seq-group" vertex="1">
-          <mxGeometry x="60" y="370" width="800" height="110" as="geometry" />
+          <mxGeometry x="60" y="374" width="800" height="80" as="geometry" />
         </mxCell>
         <mxCell id="course-loop2-condition" value="[for each professor in professorList]" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;" parent="course-loop2-frame" vertex="1">
-          <mxGeometry x="50" width="750" height="20" as="geometry" />
+          <mxGeometry x="50" width="750" height="14.545454545454545" as="geometry" />
         </mxCell>
         <mxCell id="course-loop2-msg1" value="sendNotification(message)" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=classic;fillColor=#f5f5f5;strokeColor=#666666;endFill=1;" parent="course-seq-group" edge="1">
           <mxGeometry relative="1" as="geometry">
@@ -208,8 +208,8 @@
         </mxCell>
         <mxCell id="course-final-msg1" value="enrollment complete" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;dashed=1;dashPattern=2 3;endArrow=classic;fillColor=#f5f5f5;strokeColor=#666666;endFill=1;" parent="course-seq-group" edge="1">
           <mxGeometry relative="1" as="geometry">
-            <mxPoint x="385" y="460" as="sourcePoint" />
-            <mxPoint x="185" y="460" as="targetPoint" />
+            <mxPoint x="385" y="479" as="sourcePoint" />
+            <mxPoint x="185" y="479" as="targetPoint" />
           </mxGeometry>
         </mxCell>
         <mxCell id="course-final-msg2" value="all courses processed" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;dashed=1;dashPattern=2 3;endArrow=classic;fillColor=#f5f5f5;strokeColor=#666666;endFill=1;" parent="course-seq-group" edge="1">

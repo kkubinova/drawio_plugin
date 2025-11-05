@@ -1,6 +1,6 @@
 <mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/28.2.5 Chrome/138.0.7204.251 Electron/37.6.1 Safari/537.36" version="28.2.5">
   <diagram name="Page-1" id="hA5EhwlokRMzZ5kNL8Si">
-    <mxGraphModel dx="2066" dy="1208" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1722" dy="1007" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <UserObject label="" customAnimation="" id="0">
           <mxCell />
@@ -106,19 +106,19 @@
           <mxGeometry x="-70" y="32" width="40" height="410" as="geometry" />
         </mxCell>
         <mxCell id="seq-user-activation" value="" style="points=[];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="seq-user" vertex="1">
-          <mxGeometry x="15" y="80" width="10" height="280" as="geometry" />
+          <mxGeometry x="15" y="80" width="10" height="320" as="geometry" />
         </mxCell>
         <mxCell id="seq-member" value="Member" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;size=65;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="seq-group" vertex="1">
           <mxGeometry x="80" y="32" width="120" height="410" as="geometry" />
         </mxCell>
         <mxCell id="seq-member-activation" value="" style="points=[];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="seq-member" vertex="1">
-          <mxGeometry x="55" y="100" width="10" height="260" as="geometry" />
+          <mxGeometry x="55" y="100" width="10" height="300" as="geometry" />
         </mxCell>
         <mxCell id="seq-library" value="Library" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;size=65;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="seq-group" vertex="1">
           <mxGeometry x="301" y="32" width="120" height="410" as="geometry" />
         </mxCell>
         <mxCell id="seq-library-activation" value="" style="points=[];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="seq-library" vertex="1">
-          <mxGeometry x="55" y="130" width="10" height="200" as="geometry" />
+          <mxGeometry x="55" y="130" width="10" height="250" as="geometry" />
         </mxCell>
         <mxCell id="seq-book" value="Book" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;size=65;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="seq-group" vertex="1">
           <mxGeometry x="471" y="32" width="120" height="410" as="geometry" />
@@ -155,73 +155,73 @@
         </mxCell>
         <mxCell id="msg8" value="processBookRequest(request)" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=classic;fillColor=#f5f5f5;strokeColor=#666666;endFill=1;" parent="seq-group" target="seq-librarian-activation" edge="1">
           <mxGeometry relative="1" as="geometry">
-            <mxPoint x="366" y="271.8275862068965" as="sourcePoint" />
-            <mxPoint x="775" y="271.8275862068965" as="targetPoint" />
+            <mxPoint x="366" y="255.8275862068965" as="sourcePoint" />
+            <mxPoint x="775" y="255.8275862068965" as="targetPoint" />
           </mxGeometry>
         </mxCell>
         <mxCell id="msg9" value="updateBookStatus(&quot;978-0123456789&quot;)" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;rounded=0;endArrow=classic;fillColor=#f5f5f5;strokeColor=#666666;endFill=1;" parent="seq-group" target="K57snwerg23pMpSwhqLi-9" edge="1">
           <mxGeometry y="100" relative="1" as="geometry">
-            <mxPoint x="736" y="282" as="sourcePoint" />
-            <mxPoint x="741" y="302" as="targetPoint" />
+            <mxPoint x="736" y="266" as="sourcePoint" />
+            <mxPoint x="741" y="286" as="targetPoint" />
             <Array as="points">
-              <mxPoint x="761" y="292" />
-              <mxPoint x="761" y="302" />
-              <mxPoint x="751" y="302" />
+              <mxPoint x="761" y="276" />
+              <mxPoint x="761" y="286" />
+              <mxPoint x="751" y="286" />
             </Array>
             <mxPoint as="offset" />
           </mxGeometry>
         </mxCell>
         <mxCell id="msg11" value="success" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;dashed=1;dashPattern=2 3;endArrow=classic;fillColor=#f5f5f5;strokeColor=#666666;endFill=1;" parent="seq-group" edge="1">
           <mxGeometry relative="1" as="geometry">
-            <mxPoint x="726" y="352" as="sourcePoint" />
-            <mxPoint x="366" y="352" as="targetPoint" />
+            <mxPoint x="726" y="336" as="sourcePoint" />
+            <mxPoint x="366" y="336" as="targetPoint" />
             <Array as="points">
-              <mxPoint x="671" y="352" />
+              <mxPoint x="671" y="336" />
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="msg12" value="book borrowed successfully" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;dashed=1;dashPattern=2 3;endArrow=classic;fillColor=#f5f5f5;strokeColor=#666666;endFill=1;" parent="seq-group" edge="1">
+        <mxCell id="msg12" value="borrow status" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;dashed=1;dashPattern=2 3;endArrow=classic;fillColor=#f5f5f5;strokeColor=#666666;endFill=1;" parent="seq-group" edge="1">
           <mxGeometry relative="1" as="geometry">
-            <mxPoint x="135" y="391" as="sourcePoint" />
-            <mxPoint x="-45" y="391" as="targetPoint" />
+            <mxPoint x="135" y="431" as="sourcePoint" />
+            <mxPoint x="-45" y="431" as="targetPoint" />
           </mxGeometry>
         </mxCell>
         <mxCell id="alt-frame" value="opt" style="shape=umlFrame;pointerEvents=0;dropTarget=0;strokeColor=#666666;height=20;width=30;fillColor=#f5f5f5;fontColor=#333333;" parent="seq-group" vertex="1">
-          <mxGeometry x="-120" y="242" width="1081" height="170" as="geometry" />
+          <mxGeometry x="-120" y="226" width="1081" height="170" as="geometry" />
         </mxCell>
         <mxCell id="alt-condition" value="[Book Available]" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;" parent="alt-frame" vertex="1">
           <mxGeometry x="37.27586206896552" y="5" width="1043.7241379310346" height="8.5" as="geometry" />
         </mxCell>
         <mxCell id="seq-librarian-activation" value="" style="points=[];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="seq-group" vertex="1">
-          <mxGeometry x="726" y="272" width="10" height="80" as="geometry" />
+          <mxGeometry x="726" y="256" width="10" height="80" as="geometry" />
         </mxCell>
         <mxCell id="K57snwerg23pMpSwhqLi-8" value="" style="points=[];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="seq-group" vertex="1">
-          <mxGeometry x="526" y="302" width="10" height="20" as="geometry" />
+          <mxGeometry x="526" y="286" width="10" height="20" as="geometry" />
         </mxCell>
         <mxCell id="K57snwerg23pMpSwhqLi-9" value="" style="points=[];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="seq-group" vertex="1">
-          <mxGeometry x="731" y="292" width="10" height="30" as="geometry" />
+          <mxGeometry x="731" y="276" width="10" height="30" as="geometry" />
         </mxCell>
         <mxCell id="msg10" value="updateStatus(&quot;borrowed&quot;)" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=classic;fillColor=#f5f5f5;strokeColor=#666666;endFill=1;" parent="seq-group" edge="1">
           <mxGeometry x="0.0256" relative="1" as="geometry">
-            <mxPoint x="731" y="302" as="sourcePoint" />
-            <mxPoint x="536" y="302" as="targetPoint" />
+            <mxPoint x="731" y="286" as="sourcePoint" />
+            <mxPoint x="536" y="286" as="targetPoint" />
             <Array as="points">
-              <mxPoint x="641" y="302" />
-              <mxPoint x="571" y="347" />
+              <mxPoint x="641" y="286" />
+              <mxPoint x="571" y="331" />
             </Array>
             <mxPoint as="offset" />
           </mxGeometry>
         </mxCell>
         <mxCell id="K57snwerg23pMpSwhqLi-15" value="success" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;dashed=1;dashPattern=2 3;endArrow=classic;fillColor=#f5f5f5;strokeColor=#666666;endFill=1;" parent="seq-group" edge="1">
           <mxGeometry relative="1" as="geometry">
-            <mxPoint x="536" y="321.6000000000001" as="sourcePoint" />
-            <mxPoint x="731" y="321.6000000000001" as="targetPoint" />
+            <mxPoint x="536" y="305.6000000000001" as="sourcePoint" />
+            <mxPoint x="731" y="305.6000000000001" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="K57snwerg23pMpSwhqLi-16" value="" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;dashed=1;dashPattern=2 3;endArrow=classic;fillColor=#f5f5f5;strokeColor=#666666;endFill=1;" parent="seq-group" source="seq-library-activation" edge="1">
+        <mxCell id="K57snwerg23pMpSwhqLi-16" value="" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;dashed=1;dashPattern=2 3;endArrow=classic;fillColor=#f5f5f5;strokeColor=#666666;endFill=1;" parent="seq-group" edge="1">
           <mxGeometry relative="1" as="geometry">
-            <mxPoint x="335" y="362.2413793103449" as="sourcePoint" />
-            <mxPoint x="145" y="362.1034482758621" as="targetPoint" />
+            <mxPoint x="356" y="411" as="sourcePoint" />
+            <mxPoint x="145" y="411.1034482758621" as="targetPoint" />
           </mxGeometry>
         </mxCell>
         <mxCell id="-x9Z-LVas-Tqv_CvfyP0-1" value="" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;endFill=0;strokeColor=#666666;exitX=1;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0;entryDx=0;entryDy=0;startArrow=none;startFill=0;" parent="LibrarySqD" edge="1">
